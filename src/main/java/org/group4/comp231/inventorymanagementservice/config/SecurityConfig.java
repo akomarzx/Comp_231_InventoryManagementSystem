@@ -9,26 +9,28 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.session.SessionManagementFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-//TODO: Disable security during early stages to facilitate development
-//@Configuration
-//@EnableWebSecurity
-//@EnableMethodSecurity
-//@RequiredArgsConstructor
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1")
+                        .requestMatchers(new AntPathRequestMatcher("/actuator/**"))
+                        .permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/public/**"))
+                        .permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/v1/**"))
                         .permitAll()
                         .anyRequest()
                         .authenticated()
                 )
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
-        http.
-                sessionManagement(t -> t.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
+                .sessionManagement(t -> t.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
     }
