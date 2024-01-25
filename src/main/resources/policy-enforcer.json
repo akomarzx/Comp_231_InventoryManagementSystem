@@ -4,5 +4,15 @@
   "resource": "inventory-management-dev",
   "credentials": {
     "secret": "wibdq3ubBHvlsfZI2kTwrUrqRn4dGWj4"
-  }
+  },
+  "paths": [
+    {
+      "path": "/public/*",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/actuator/*",
+      "enforcement-mode": "DISABLED"
+    }
+  ]
 }

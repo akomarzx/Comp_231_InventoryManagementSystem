@@ -2,8 +2,6 @@ package org.group4.comp231.inventorymanagementservice.config;
 
 import lombok.RequiredArgsConstructor;
 import org.keycloak.adapters.authorization.integration.jakarta.ServletPolicyEnforcerFilter;
-import org.keycloak.adapters.authorization.spi.ConfigurationResolver;
-import org.keycloak.adapters.authorization.spi.HttpRequest;
 import org.keycloak.representations.adapters.config.PolicyEnforcerConfig;
 import org.keycloak.util.JsonSerialization;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +37,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/public/**"))
                         .permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v1/**"))
+                        .anyRequest()
                         .authenticated()
                 )
                 .sessionManagement(t -> t.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -57,12 +55,7 @@ public class SecurityConfig {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return new ServletPolicyEnforcerFilter(new ConfigurationResolver() {
-            @Override
-            public PolicyEnforcerConfig resolve(HttpRequest request) {
-                return config;
-            }
-        });
+        return new ServletPolicyEnforcerFilter(request -> config);
     }
 
     @Bean
