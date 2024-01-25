@@ -49,7 +49,6 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-mysql</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -80,6 +79,19 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-policy-enforcer -->
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-policy-enforcer</artifactId>
+			<version>23.0.4</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.keycloak/keycloak-core -->
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-core</artifactId>
+			<version>23.0.4</version>
 		</dependency>
 	</dependencies>
 
