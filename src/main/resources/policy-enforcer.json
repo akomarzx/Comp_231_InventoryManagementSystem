@@ -1,0 +1,18 @@
+{
+  "realm": "Com231_GroupProject",
+  "auth-server-url": "https://ronaldjro.dev:8443",
+  "resource": "inventory-management-dev",
+  "credentials": {
+    "secret": "wibdq3ubBHvlsfZI2kTwrUrqRn4dGWj4"
+  },
+  "paths": [
+    {
+      "path": "/public/*",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/actuator/*",
+      "enforcement-mode": "DISABLED"
+    }
+  ]
+}
