@@ -101,7 +101,11 @@ insert into code_value (code_value_id, code_book_id, label,created_at, created_b
 insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('300040', 30000, 'Completed',current_timestamp(), 'System');
 insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('300050', 30000, 'Cancelled',current_timestamp(), 'System');
 #Document Type
-#TODO: No Doc Type Yet
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('400010', 40000, 'Sales Order',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('400020', 40000, 'Purchase Orders',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('400030', 40000, 'Invoice',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('400040', 40000, 'Return Sales Order',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('400050', 40000, 'Return Purchase Order',current_timestamp(), 'System');
 #Order Type
 insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('500010', 50000, 'Purchase Order',current_timestamp(), 'System');
 insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('500020', 50000, 'Customer Order',current_timestamp(), 'System');
@@ -122,6 +126,7 @@ create table if not exists `product` (
     tenant_id bigint not null,
     upi bigint unique,
     label varchar(255) not null,
+    image_url varchar(255),
     created_at timestamp not null,
     created_by varchar(255) not null,
     updated_at timestamp,
@@ -201,7 +206,9 @@ create table if not exists `address` (
     foreign key (country_id)
         references code_value (code_value_id)
         on update restrict
-        on delete cascade
+        on delete cascade,
+    check ( country_id between 10000 and 19999),
+    check ( province_id between 20000 and 29999)
 )ENGINE=INNODB;
 
 create index address_tenant_id_idx on address (tenant_id);
@@ -229,6 +236,7 @@ create index warehouse_tenant_id_idx on warehouse (tenant_id);
 
 create table if not exists `order` (
     order_id bigint primary key auto_increment,
+    order_reference_number varchar(255) unique not null,
     tenant_id bigint not null,
     order_type bigint not null,
     order_status bigint not  null default 300010,
@@ -243,7 +251,9 @@ create table if not exists `order` (
     foreign key (order_status)
         references code_value (code_value_id)
         on update restrict
-        on delete cascade
+        on delete cascade,
+    check ( order_type between 50000 and 59999),
+    check ( order_status between 30000 and 39999)
 ) Engine=INNODB;
 
 create index order_tenant_id_idx on `order` (tenant_id);
@@ -281,4 +291,67 @@ create index inventory_tenant_id_idx on inventory (tenant_id);
 create index inventory_product_id_idx on inventory (product_id);
 create index inventory_warehouse_id_idx on inventory (warehouse_id);
 
+create table if not exists `order_item` (
+    order_item_id bigint primary key auto_increment,
+    order_id bigint not null,
+    product_id bigint not null,
+    tenant_id bigint not null,
+    inventory_id bigint not null,
+    sku varchar(255) not null,
+    quantity int not null,
+    created_at timestamp not null,
+    created_by varchar(255) not null,
+    updated_at timestamp,
+    updated_by varchar(255),
+    foreign key(product_id)
+        references product (product_id)
+        on update restrict
+        on delete cascade,
+    foreign key (tenant_id)
+        references tenant (tenant_id)
+        on update restrict
+        on delete cascade,
+    foreign key (order_id)
+        references `order` (order_id)
+        on update restrict
+        on delete cascade,
+    foreign key (inventory_id)
+        references `inventory` (inventory_id)
+        on update restrict
+        on delete cascade
+)ENGINE=INNODB;
 
+create index order_item_tenant_id_idx on order_item (tenant_id);
+create index order_item_order_id_idx on order_item (order_id);
+create index order_item_product_id_idx on order_item (product_id);
+create index order_item_inventory_id_idx on order_item (inventory_id);
+
+create table if not exists `document` (
+    document_id bigint primary key auto_increment,
+    document_type bigint not null,
+    tenant_id bigint not null,
+    label varchar(255) not null,
+    document blob,
+    created_at timestamp not null,
+    created_by varchar(255) not null,
+    updated_at timestamp,
+    updated_by varchar(255),
+    foreign key (document_id)
+        references `code_value` (code_value_id)
+        on update restrict
+        on delete cascade,
+    foreign key (tenant_id)
+        references `tenant` (tenant_id)
+        on update restrict
+        on delete cascade
+)ENGINE=INNODB;
+
+create index document_document_type_idx on document (document_type);
+
+create view view_get_static_values
+as
+    select  cval.code_value_id, cbook.code_book_id, cval.label
+    from    code_book as cbook inner join
+            code_value as cval on cbook.code_book_id = cval.code_book_id
+    order by
+            cbook.code_book_id
