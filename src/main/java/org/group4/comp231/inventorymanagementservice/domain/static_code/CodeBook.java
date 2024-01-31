@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -48,6 +46,7 @@ public class CodeBook {
     private String updatedBy;
 
     @OneToMany(mappedBy = "codeBook", fetch = FetchType.EAGER)
+    @OrderBy(value = "code_value_id asc ")
     private Set<CodeValue> codeValues = new LinkedHashSet<>();
 
 }

@@ -1,8 +1,7 @@
 package org.group4.comp231.inventorymanagementservice.controller;
 
-import jakarta.transaction.Transactional;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeBook;
-import org.group4.comp231.inventorymanagementservice.repository.CodeBookRepository;
+import org.group4.comp231.inventorymanagementservice.services.StaticCodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,16 +14,16 @@ import java.util.List;
 @RequestMapping("/code")
 public class StaticCodeController {
 
-    private final CodeBookRepository codeBookRepository;
+    private final StaticCodeService staticCodeService;
 
-    public StaticCodeController(CodeBookRepository codeBookRepository) {
-        this.codeBookRepository = codeBookRepository;
+    public StaticCodeController(StaticCodeService staticCodeService) {
+        this.staticCodeService = staticCodeService;
     }
 
     @GetMapping
-    @Transactional
     public ResponseEntity<List<CodeBook>> getAllStaticValues(){
-        List<CodeBook> valueList = this.codeBookRepository.findAll();
+        List<CodeBook> valueList = this.staticCodeService.getAllStaticCode();
         return new ResponseEntity<>(valueList, HttpStatus.OK);
     }
+
 }
