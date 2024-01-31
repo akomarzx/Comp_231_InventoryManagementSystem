@@ -5,6 +5,7 @@
   "credentials": {
     "secret": "wibdq3ubBHvlsfZI2kTwrUrqRn4dGWj4"
   },
+  "http-method-as-scope": true,
   "paths": [
     {
       "path": "/public/*",
@@ -12,6 +13,10 @@
     },
     {
       "path": "/actuator/*",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path": "/error",
       "enforcement-mode": "DISABLED"
     }
   ]
