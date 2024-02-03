@@ -1,7 +1,7 @@
 {
   "realm": "Com231_GroupProject",
   "auth-server-url": "https://ronaldjro.dev:8443",
-  "resource": "inventory-management-dev",
+  "resource": "0f704701-7046-4353-a978-42de5479287f-inventory-client",
   "credentials": {
     "secret": "wibdq3ubBHvlsfZI2kTwrUrqRn4dGWj4"
   },
