@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.group4.comp231</groupId>
 	<artifactId>InventoryManagementService</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>InventoryManagementService</name>
 	<description>InventoryManagementService</description>
 	<properties>
