@@ -1,9 +1,9 @@
 {
   "realm": "Com231_GroupProject",
   "auth-server-url": "https://ronaldjro.dev:8443",
-  "resource": "0f704701-7046-4353-a978-42de5479287f-inventory-client",
+  "resource": "",
   "credentials": {
-    "secret": "wibdq3ubBHvlsfZI2kTwrUrqRn4dGWj4"
+    "secret": ""
   },
   "http-method-as-scope": true,
   "paths": [
