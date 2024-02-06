@@ -26,6 +26,10 @@
     {
       "path" : "/v3/api-docs/*",
       "enforcement-mode": "DISABLED"
+    },
+    {
+      "path" : "/docs",
+      "enforcement-mode": "DISABLED"
     }
   ]
 }
