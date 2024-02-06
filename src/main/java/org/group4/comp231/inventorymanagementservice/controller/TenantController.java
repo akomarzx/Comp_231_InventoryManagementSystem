@@ -1,5 +1,6 @@
 package org.group4.comp231.inventorymanagementservice.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDTO;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/tenant")
+@SecurityRequirement(name = "Keycloak")
 public class TenantController {
 
     private final TenantService tenantService;

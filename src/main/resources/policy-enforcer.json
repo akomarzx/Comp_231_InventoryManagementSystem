@@ -18,6 +18,14 @@
     {
       "path": "/error",
       "enforcement-mode": "DISABLED"
+    },
+    {
+      "path" : "/swagger-ui/*",
+      "enforcement-mode": "DISABLED"
+    },
+    {
+      "path" : "/v3/api-docs/*",
+      "enforcement-mode": "DISABLED"
     }
   ]
 }
