@@ -1,11 +1,19 @@
 package org.group4.comp231.inventorymanagementservice;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 @SpringBootApplication
+@SecurityScheme(
+		name = "Keycloak",
+		openIdConnectUrl = "https://ronaldjro.dev:8443/realms/Com231_GroupProject/.well-known/openid-configuration",
+		scheme = "bearer",
+		type = SecuritySchemeType.OPENIDCONNECT,
+		in = SecuritySchemeIn.HEADER
+)
 public class InventoryManagementServiceApplication {
 
 	public static void main(String[] args) {
