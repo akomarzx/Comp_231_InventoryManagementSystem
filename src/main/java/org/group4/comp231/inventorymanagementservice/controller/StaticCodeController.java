@@ -1,6 +1,7 @@
 package org.group4.comp231.inventorymanagementservice.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeBook;
 import org.group4.comp231.inventorymanagementservice.services.StaticCodeService;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/code")
 @SecurityRequirement(name = "Keycloak")
+@Tag(name = "Static Code", description = "Static Codes inside of the API")
 public class StaticCodeController {
 
     private final StaticCodeService staticCodeService;
