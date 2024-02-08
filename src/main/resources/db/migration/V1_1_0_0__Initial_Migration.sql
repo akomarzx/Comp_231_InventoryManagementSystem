@@ -121,6 +121,25 @@ create table  if not exists tenant (
     updated_by varchar(255)
 ) ENGINE=INNODB;
 
+create table if not exists `product` (
+    product_id bigint auto_increment primary key,
+    tenant_id bigint not null,
+    upi bigint unique,
+    label varchar(255) not null,
+    image_url varchar(255),
+    created_at timestamp not null,
+    created_by varchar(255) not null,
+    updated_at timestamp,
+    updated_by varchar(255),
+    foreign key(tenant_id)
+        references tenant (tenant_id)
+        on update restrict
+        on delete cascade
+) ENGINE=INNODB;
+
+create index product_upi_idx on product (upi);
+create index product_tenant_id_idx on product (tenant_id);
+
 create table if not exists `category` (
     category_id bigint auto_increment primary key,
     tenant_id bigint not null,
@@ -136,6 +155,33 @@ create table if not exists `category` (
 ) ENGINE=INNODB;
 
 create index category_tenant_id_idx on category (tenant_id);
+
+create table if not exists `product_category` (
+    product_id bigint,
+    category_id bigint,
+    tenant_id bigint not null ,
+    created_at timestamp not null,
+    created_by varchar(255) not null,
+    updated_at timestamp,
+    updated_by varchar(255),
+    primary key(product_id, category_id, tenant_id),
+    foreign key(product_id)
+        references product (product_id)
+        on update restrict 
+        on delete cascade,
+    foreign key(category_id)
+        references category (category_id)
+        on update restrict 
+        on delete cascade,
+    foreign key(tenant_id)
+        references tenant (tenant_id)
+        on update restrict
+        on delete cascade
+);
+
+create index product_category_product_id_idx on product_category (product_id);
+create index product_category_category_id_idx on product_category (category_id);
+create index product_category_tenant_id_idx on product_category (tenant_id);
 
 create table if not exists `address` (
     address_id bigint primary key  auto_increment,
@@ -216,9 +262,7 @@ create index order_order_status_id_idx on `order` (order_status);
 
 create table if not exists inventory (
     inventory_id bigint primary key auto_increment,
-    image_url varchar(255),
-    label varchar(255),
-    description varchar(255),
+    product_id bigint not null,
     tenant_id bigint not null,
     sku varchar(255) not null unique,
     warehouse_id bigint not null,
@@ -229,6 +273,10 @@ create table if not exists inventory (
     created_by varchar(255) not null,
     updated_at timestamp,
     updated_by varchar(255),
+    foreign key(product_id)
+        references product (product_id)
+        on update restrict
+        on delete cascade,
     foreign key (tenant_id)
         references tenant (tenant_id)
         on update restrict
@@ -240,11 +288,13 @@ create table if not exists inventory (
 )ENGINE = INNODB;
 
 create index inventory_tenant_id_idx on inventory (tenant_id);
+create index inventory_product_id_idx on inventory (product_id);
 create index inventory_warehouse_id_idx on inventory (warehouse_id);
 
 create table if not exists `order_item` (
     order_item_id bigint primary key auto_increment,
     order_id bigint not null,
+    product_id bigint not null,
     tenant_id bigint not null,
     inventory_id bigint not null,
     sku varchar(255) not null,
@@ -253,6 +303,10 @@ create table if not exists `order_item` (
     created_by varchar(255) not null,
     updated_at timestamp,
     updated_by varchar(255),
+    foreign key(product_id)
+        references product (product_id)
+        on update restrict
+        on delete cascade,
     foreign key (tenant_id)
         references tenant (tenant_id)
         on update restrict
@@ -269,6 +323,7 @@ create table if not exists `order_item` (
 
 create index order_item_tenant_id_idx on order_item (tenant_id);
 create index order_item_order_id_idx on order_item (order_id);
+create index order_item_product_id_idx on order_item (product_id);
 create index order_item_inventory_id_idx on order_item (inventory_id);
 
 create table if not exists `document` (
@@ -293,30 +348,10 @@ create table if not exists `document` (
 
 create index document_document_type_idx on document (document_type);
 
-create table if not exists `product_category` (
-    inventory_id bigint,
-    category_id bigint,
-    tenant_id bigint not null ,
-    created_at timestamp not null,
-    created_by varchar(255) not null,
-    updated_at timestamp,
-    updated_by varchar(255),
-    primary key(inventory_id, category_id, tenant_id),
-    foreign key(inventory_id)
-        references inventory (inventory_id)
-        on update restrict
-        on delete cascade,
-    foreign key(category_id)
-        references category (category_id)
-        on update restrict
-        on delete cascade,
-    foreign key(tenant_id)
-        references tenant (tenant_id)
-        on update restrict
-        on delete cascade
-);
-
-create index product_category_inventory_id_idx on product_category (inventory_id);
-create index product_category_category_id_idx on product_category (category_id);
-create index product_category_tenant_id_idx on product_category (tenant_id);
-
+create view view_get_static_values
+as
+    select  cval.code_value_id, cbook.code_book_id, cval.label
+    from    code_book as cbook inner join
+            code_value as cval on cbook.code_book_id = cval.code_book_id
+    order by
+            cbook.code_book_id
