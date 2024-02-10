@@ -12,6 +12,7 @@ insert into code_book (code_book_id, label, created_at, created_by, updated_at, 
 insert into code_book (code_book_id, label, created_at, created_by, updated_at, updated_by) values (30000, 'Order Status', current_timestamp(), 'System', null, null);
 insert into code_book (code_book_id, label, created_at, created_by, updated_at, updated_by) values (40000, 'Document Type', current_timestamp(), 'System', null, null);
 insert into code_book (code_book_id, label, created_at, created_by, updated_at, updated_by) values (50000, 'Order Type', current_timestamp(), 'System', null, null);
+insert into code_book (code_book_id, label, created_at, created_by, updated_at, updated_by) values (60000, 'Account Type', current_timestamp(), 'System', null, null);
 
 create table if not exists `code_value` (
     code_value_id bigint primary key,
@@ -109,12 +110,16 @@ insert into code_value (code_value_id, code_book_id, label,created_at, created_b
 #Order Type
 insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('500010', 50000, 'Purchase Order',current_timestamp(), 'System');
 insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('500020', 50000, 'Customer Order',current_timestamp(), 'System');
+#Account Type
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('600010', 60000, 'Vendor Account',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('600020', 60000, 'Customer Account',current_timestamp(), 'System');
 
 create index code_value_code_book_id_idx on code_value (code_book_id);
 
 create table  if not exists tenant (
     tenant_id bigint auto_increment primary key,
     label varchar(255) not null unique,
+    primary_email varchar(255),
     created_at timestamp not null,
     created_by varchar(255) not null,
     updated_at timestamp,
@@ -125,6 +130,7 @@ create table if not exists `product` (
     product_id bigint auto_increment primary key,
     tenant_id bigint not null,
     upi bigint unique,
+    price decimal,
     label varchar(255) not null,
     image_url varchar(255),
     created_at timestamp not null,
@@ -191,6 +197,7 @@ create table if not exists `address` (
     city varchar(255) not null,
     province_id bigint not null,
     country_id bigint not null,
+    primary_phone varchar(255),
     created_at timestamp not null,
     created_by varchar(255) not null,
     updated_at timestamp,
@@ -212,6 +219,8 @@ create table if not exists `address` (
 )ENGINE=INNODB;
 
 create index address_tenant_id_idx on address (tenant_id);
+create index address_province_id_idx on address (province_id);
+create index address_country_id_idx on address (country_id);
 
 create table if not exists `warehouse` (
     warehouse_id bigint primary key auto_increment,
@@ -233,12 +242,43 @@ create table if not exists `warehouse` (
 )ENGINE=INNODB;
 
 create index warehouse_tenant_id_idx on warehouse (tenant_id);
+create index warehouse_address_id_idx on warehouse (address_id);
+
+create table if not exists  `account` (
+      account_id bigint primary key auto_increment,
+      tenant_id bigint not null,
+      account_type bigint not  null,
+      address_id bigint not null,
+      label varchar(255),
+      created_at timestamp not null,
+      created_by varchar(255) not null,
+      updated_at timestamp,
+      updated_by varchar(255),
+      foreign key (account_type)
+          references code_value (code_value_id)
+          on update restrict
+          on delete cascade,
+      foreign key (tenant_id)
+          references tenant (tenant_id)
+          on update restrict
+          on delete cascade,
+      foreign key (address_id)
+          references address (address_id)
+          on update restrict
+          on delete cascade,
+      check ( account_type between 60000 and 69999)
+)ENGINE=INNODB;
+
+create index account_tenant_id_idx on account (tenant_id);
+create index account_account_type_id_idx on account (account_type);
+create index account_address_id_idx on account (address_id);
 
 create table if not exists `order` (
     order_id bigint primary key auto_increment,
     order_reference_number varchar(255) unique not null,
     tenant_id bigint not null,
     order_type bigint not null,
+    account_id bigint not null,
     order_status bigint not  null default 300010,
     created_at timestamp not null,
     created_by varchar(255) not null,
@@ -252,6 +292,14 @@ create table if not exists `order` (
         references code_value (code_value_id)
         on update restrict
         on delete cascade,
+    foreign key (tenant_id)
+        references tenant (tenant_id)
+        on update restrict
+        on delete cascade,
+    foreign key (account_id)
+        references account (account_id)
+        on update restrict
+        on delete cascade,
     check ( order_type between 50000 and 59999),
     check ( order_status between 30000 and 39999)
 ) Engine=INNODB;
@@ -259,6 +307,7 @@ create table if not exists `order` (
 create index order_tenant_id_idx on `order` (tenant_id);
 create index order_order_type_id_idx on `order` (order_type);
 create index order_order_status_id_idx on `order` (order_status);
+create index order_account_id_idx on `order` (account_id);
 
 create table if not exists inventory (
     inventory_id bigint primary key auto_increment,
@@ -291,6 +340,8 @@ create index inventory_tenant_id_idx on inventory (tenant_id);
 create index inventory_product_id_idx on inventory (product_id);
 create index inventory_warehouse_id_idx on inventory (warehouse_id);
 
+
+
 create table if not exists `order_item` (
     order_item_id bigint primary key auto_increment,
     order_id bigint not null,
@@ -299,6 +350,7 @@ create table if not exists `order_item` (
     inventory_id bigint not null,
     sku varchar(255) not null,
     quantity int not null,
+    quantity_recevied int default 0,
     created_at timestamp not null,
     created_by varchar(255) not null,
     updated_at timestamp,
@@ -346,12 +398,3 @@ create table if not exists `document` (
         on delete cascade
 )ENGINE=INNODB;
 
-create index document_document_type_idx on document (document_type);
-
-create view view_get_static_values
-as
-    select  cval.code_value_id, cbook.code_book_id, cval.label
-    from    code_book as cbook inner join
-            code_value as cval on cbook.code_book_id = cval.code_book_id
-    order by
-            cbook.code_book_id

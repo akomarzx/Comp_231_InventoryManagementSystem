@@ -37,6 +37,18 @@ public class Tenant {
     @Column(name = "updated_by")
     private String updatedBy;
 
+    @Size(max = 255)
+    @Column(name = "primary_email")
+    private String primaryEmail;
+
+    public String getPrimaryEmail() {
+        return primaryEmail;
+    }
+
+    public void setPrimaryEmail(String primaryEmail) {
+        this.primaryEmail = primaryEmail;
+    }
+
     public Long getId() {
         return this.id;
     }
