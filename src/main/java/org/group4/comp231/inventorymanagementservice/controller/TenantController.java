@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/tenant")
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Tenant", description = "Endpoints for Tenant Management")
 public class TenantController {
@@ -28,20 +27,23 @@ public class TenantController {
         this.tenantService = tenantService;
     }
 
-    @GetMapping
+    @GetMapping("/tenant")
+    @Tag(name = "Get All Tenants", description = "View all current Tenant in the Platform. Available only for superusers")
     public ResponseEntity<List<TenantDTO>> getAllTenants() {
         List<TenantDTO> list = this.tenantService.getAllTenants();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/public/tenant")
     @ResponseStatus(code = HttpStatus.CREATED)
+    @Tag(name = "New Tenant Endpoint", description = "Public Endpoint for creating new Tenant in the SaaS platform")
     public ResponseEntity<ObjectUtils.Null> createTenant(@Valid @RequestBody UserRegistrationDto dto) throws Exception {
         this.tenantService.createTenant(dto);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("tenant/{id}")
+    @Tag(name = "New Tenant Endpoint", description = "Public Endpoint for creating new Tenant in the SaaS platform")
     public ResponseEntity<TenantDTO> updateTenant(@PathVariable("id") Long id ,
                                                   @Valid @RequestBody CreateUpdateTenantDTO createUpdateTenantDTO,
                                                   @AuthenticationPrincipal(expression = "claims['email']") String username){

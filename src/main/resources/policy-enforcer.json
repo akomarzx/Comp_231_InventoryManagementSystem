@@ -6,6 +6,7 @@
     "secret": ""
   },
   "http-method-as-scope": true,
+  "enforcement-mode" : "ENFORCING",
   "paths": [
     {
       "path": "/public/*",
@@ -30,15 +31,6 @@
     {
       "path" : "/docs",
       "enforcement-mode": "DISABLED"
-    },
-    {
-      "path" : "/tenant",
-      "enforcement-mode": "DISABLED",
-      "methods": [
-        {
-          "method": "POST"
-        }
-      ]
     }
   ]
 }
