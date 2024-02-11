@@ -42,7 +42,7 @@ public class OpenAPIConfig {
                 .title("Inventory management System")
                 .version("1.0")
                 .contact(contact)
-                .description("This API is for managing Customers Inventory.")
+                .description("Inventory Management System API - Developed By Group 3 \n Tony, John, Ronald, Aruna, Santiago, Arpan, Matthew.")
                 .license(mitLicense);
 
         return new OpenAPI().info(info).servers(List.of(devServer, prodServer));

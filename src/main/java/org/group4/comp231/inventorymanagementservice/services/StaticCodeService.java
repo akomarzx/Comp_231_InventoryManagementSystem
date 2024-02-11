@@ -18,7 +18,7 @@ public class StaticCodeService {
     }
 
     public List<CodeBook> getAllStaticCode() {
-        if(codeBook == null) {
+        if (codeBook == null) {
             this.codeBook = this.codeBookRepository.findAll();
         }
 

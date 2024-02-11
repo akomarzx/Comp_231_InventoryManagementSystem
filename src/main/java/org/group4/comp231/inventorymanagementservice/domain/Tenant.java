@@ -3,6 +3,8 @@ package org.group4.comp231.inventorymanagementservice.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Instant;
 
@@ -21,8 +23,11 @@ public class Tenant {
     @Column(name = "label", nullable = false)
     private String label;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false)
+    @Size(max = 255)
+    @Column(name = "primary_email")
+    private String primaryEmail;
+
+    @Column(name = "created_at")
     private Instant createdAt;
 
     @Size(max = 255)
@@ -38,47 +43,58 @@ public class Tenant {
     private String updatedBy;
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
-    public @Size(max = 255) @NotNull String getLabel() {
-        return this.label;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public @NotNull Instant getCreatedAt() {
-        return this.createdAt;
+    public String getLabel() {
+        return label;
     }
 
-    public @Size(max = 255) @NotNull String getCreatedBy() {
-        return this.createdBy;
-    }
-
-    public Instant getUpdatedAt() {
-        return this.updatedAt;
-    }
-
-    public @Size(max = 255) String getUpdatedBy() {
-        return this.updatedBy;
-    }
-
-    public void setLabel(@Size(max = 255) @NotNull String label) {
+    public void setLabel(String label) {
         this.label = label;
     }
 
-    public void setCreatedAt(@NotNull Instant createdAt) {
+    public String getPrimaryEmail() {
+        return primaryEmail;
+    }
+
+    public void setPrimaryEmail(String primaryEmail) {
+        this.primaryEmail = primaryEmail;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public void setCreatedBy(@Size(max = 255) @NotNull String createdBy) {
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public void setUpdatedBy(@Size(max = 255) String updatedBy) {
-        this.updatedBy = updatedBy;
+    public String getUpdatedBy() {
+        return updatedBy;
     }
 
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
 }

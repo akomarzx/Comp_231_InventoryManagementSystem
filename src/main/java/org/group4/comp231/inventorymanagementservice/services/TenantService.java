@@ -1,13 +1,14 @@
 package org.group4.comp231.inventorymanagementservice.services;
 
+import jakarta.transaction.Transactional;
 import org.group4.comp231.inventorymanagementservice.domain.Tenant;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDTO;
+import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
 import org.group4.comp231.inventorymanagementservice.mapper.TenantMapper;
 import org.group4.comp231.inventorymanagementservice.repository.TenantRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,10 +20,12 @@ public class TenantService {
 
     private final TenantRepository tenantRepository;
     private final TenantMapper tenantMapper;
+    private final UserService userService;
 
-    public TenantService(TenantRepository tenantRepository, TenantMapper tenantMapper) {
+    public TenantService(TenantRepository tenantRepository, TenantMapper tenantMapper, UserService userService) {
         this.tenantRepository = tenantRepository;
         this.tenantMapper = tenantMapper;
+        this.userService = userService;
     }
 
     public List<TenantDTO> getAllTenants() {
@@ -30,40 +33,44 @@ public class TenantService {
         List<Tenant> tenants = this.tenantRepository.findAll();
         List<TenantDTO> tenantDTOList = new ArrayList<>();
 
-        for(Tenant tenant : tenants) {
+        for (Tenant tenant : tenants) {
             tenantDTOList.add(this.tenantMapper.toDto(tenant));
         }
 
         return tenantDTOList;
     }
 
-    public TenantDTO createTenant(CreateUpdateTenantDTO createUpdateTenantDTO, String username) {
+    @Transactional(rollbackOn = {WebClientResponseException.class, Exception.class})
+    public void createTenant(UserRegistrationDto dto) throws Exception {
 
+        String responseMessage = null;
         Tenant newTenant = new Tenant();
 
-        newTenant.setCreatedBy(username);
-        newTenant.setCreatedAt(Instant.now());
-        newTenant.setLabel(createUpdateTenantDTO.label());
+        newTenant.setCreatedBy(dto.getEmail());
+        newTenant.setLabel(dto.getCompanyName());
+        newTenant.setPrimaryEmail(dto.getEmail());
 
         newTenant = this.tenantRepository.save(newTenant);
 
-        return this.tenantMapper.toDto(newTenant);
+        //After Creating New Tenant - Create the new user in the IAM platform
+        this.userService.registerNewTenant(dto, newTenant.getId());
+
     }
 
-    public ResponseEntity<TenantDTO> updateTenant(Long id, CreateUpdateTenantDTO dto, String username){
+    public TenantDTO updateTenant(Long id, CreateUpdateTenantDTO dto, String username){
 
         Optional<Tenant> tenant = this.tenantRepository.findById(id);
 
-        if(tenant.isEmpty()) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        if (tenant.isEmpty()) {
+            return null;
         }
 
-        tenant.get().setLabel(dto.label());
+        tenant.get().setLabel(dto.companyName());
         tenant.get().setUpdatedAt(Instant.now());
         tenant.get().setUpdatedBy(username);
 
         this.tenantRepository.save(tenant.get());
 
-        return new ResponseEntity<>(this.tenantMapper.toDto(tenant.get()), HttpStatus.OK);
+        return this.tenantMapper.toDto(tenant.get());
     }
 }
