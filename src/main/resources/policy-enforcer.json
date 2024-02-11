@@ -30,6 +30,15 @@
     {
       "path" : "/docs",
       "enforcement-mode": "DISABLED"
+    },
+    {
+      "path" : "/tenant",
+      "enforcement-mode": "DISABLED",
+      "methods": [
+        {
+          "method": "POST"
+        }
+      ]
     }
   ]
 }

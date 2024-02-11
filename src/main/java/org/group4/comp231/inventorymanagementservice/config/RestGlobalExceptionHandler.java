@@ -19,8 +19,16 @@ public class RestGlobalExceptionHandler {
         ErrorMessage message = new ErrorMessage(
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
-                ex.getAllErrors().toString(),
-                Objects.requireNonNull(ex.getFieldError()).toString());
+                ex.getAllErrors().toString());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = {Exception.class})
+    public ResponseEntity<ErrorMessage> invalidRequestBody(Exception ex, WebRequest request) {
+        ErrorMessage message = new ErrorMessage(
+                HttpStatus.BAD_REQUEST.value(),
+                LocalDateTime.now(),
+                ex.getMessage());
 
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }

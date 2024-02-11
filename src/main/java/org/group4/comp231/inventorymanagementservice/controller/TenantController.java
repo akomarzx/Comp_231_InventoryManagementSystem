@@ -3,8 +3,10 @@ package org.group4.comp231.inventorymanagementservice.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.apache.commons.lang3.ObjectUtils;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDTO;
+import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
 import org.group4.comp231.inventorymanagementservice.services.TenantService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/tenant")
@@ -32,9 +35,10 @@ public class TenantController {
     }
 
     @PostMapping
-    public ResponseEntity<TenantDTO> createTenant(@Valid @RequestBody CreateUpdateTenantDTO createUpdateTenantDTO, @AuthenticationPrincipal(expression = "claims['email']") String username) {
-        TenantDTO newTenant = this.tenantService.createTenant(createUpdateTenantDTO, username);
-        return new ResponseEntity<>(newTenant, HttpStatus.CREATED);
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public ResponseEntity<ObjectUtils.Null> createTenant(@Valid @RequestBody UserRegistrationDto dto) throws Exception {
+        this.tenantService.createTenant(dto);
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
@@ -42,6 +46,12 @@ public class TenantController {
                                                   @Valid @RequestBody CreateUpdateTenantDTO createUpdateTenantDTO,
                                                   @AuthenticationPrincipal(expression = "claims['email']") String username){
 
-        return this.tenantService.updateTenant(id, createUpdateTenantDTO, username);
+        TenantDTO updateTenantDto = this.tenantService.updateTenant(id, createUpdateTenantDTO, username);
+
+        if (updateTenantDto != null) {
+            return new ResponseEntity<>(updateTenantDto, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     }
 }
