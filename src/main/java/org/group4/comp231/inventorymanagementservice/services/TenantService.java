@@ -3,7 +3,7 @@ package org.group4.comp231.inventorymanagementservice.services;
 import jakarta.transaction.Transactional;
 import org.group4.comp231.inventorymanagementservice.domain.Tenant;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
-import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDTO;
+import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDto;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
 import org.group4.comp231.inventorymanagementservice.mapper.TenantMapper;
 import org.group4.comp231.inventorymanagementservice.repository.TenantRepository;
@@ -28,10 +28,17 @@ public class TenantService {
         this.userService = userService;
     }
 
-    public List<TenantDTO> getAllTenants() {
+    public  TenantDto getTenant(Long id) {
+
+        Optional<Tenant> tenant = this.tenantRepository.findById(id);
+
+        return tenant.map(this.tenantMapper::toDto).orElse(null);
+    }
+
+    public List<TenantDto> getAllTenants() {
 
         List<Tenant> tenants = this.tenantRepository.findAll();
-        List<TenantDTO> tenantDTOList = new ArrayList<>();
+        List<TenantDto> tenantDTOList = new ArrayList<>();
 
         for (Tenant tenant : tenants) {
             tenantDTOList.add(this.tenantMapper.toDto(tenant));
@@ -49,6 +56,7 @@ public class TenantService {
         newTenant.setCreatedBy(dto.getEmail());
         newTenant.setLabel(dto.getCompanyName());
         newTenant.setPrimaryEmail(dto.getEmail());
+        newTenant.setCreatedAt(Instant.now());
 
         newTenant = this.tenantRepository.save(newTenant);
 
@@ -57,7 +65,8 @@ public class TenantService {
 
     }
 
-    public TenantDTO updateTenant(Long id, CreateUpdateTenantDTO dto, String username){
+    // Todo: Update users info in keycloak as well.
+    public TenantDto updateTenant(Long id, CreateUpdateTenantDTO dto, String username){
 
         Optional<Tenant> tenant = this.tenantRepository.findById(id);
 

@@ -3,10 +3,11 @@ package org.group4.comp231.inventorymanagementservice.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.apache.commons.lang3.ObjectUtils;
+import jakarta.validation.constraints.NotNull;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
-import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDTO;
-import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
+import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDto;
 import org.group4.comp231.inventorymanagementservice.services.TenantService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,42 +19,60 @@ import java.util.Objects;
 
 @RestController
 @SecurityRequirement(name = "Keycloak")
+@RequestMapping("/tenant")
 @Tag(name = "Tenant", description = "Endpoints for Tenant Management")
 public class TenantController {
-
+    private static final Log log = LogFactory.getLog(TenantController.class);
     private final TenantService tenantService;
 
     public TenantController(TenantService tenantService) {
         this.tenantService = tenantService;
     }
 
-    @GetMapping("/tenant")
-    @Tag(name = "Get All Tenants", description = "View all current Tenant in the Platform. Available only for superusers")
-    public ResponseEntity<List<TenantDTO>> getAllTenants() {
-        List<TenantDTO> list = this.tenantService.getAllTenants();
+    @GetMapping()
+    public ResponseEntity<List<TenantDto>> getAllTenants() {
+        List<TenantDto> list = this.tenantService.getAllTenants();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @PostMapping("/public/tenant")
-    @ResponseStatus(code = HttpStatus.CREATED)
-    @Tag(name = "New Tenant Endpoint", description = "Public Endpoint for creating new Tenant in the SaaS platform")
-    public ResponseEntity<ObjectUtils.Null> createTenant(@Valid @RequestBody UserRegistrationDto dto) throws Exception {
-        this.tenantService.createTenant(dto);
-        return new ResponseEntity<>(null, HttpStatus.CREATED);
+    @GetMapping("/{id}")
+    public ResponseEntity<TenantDto> getTenant(@NotNull @PathVariable("id") Long id,
+                                               @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
+
+        if(validateIfTenantIDMatched(id, tenantId)) {
+            throw new Exception("Invalid Tenant Id");
+        }
+
+        TenantDto dto = this.tenantService.getTenant(id);
+
+        if(dto != null) {
+            return new ResponseEntity<>(dto, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
-    @PatchMapping("tenant/{id}")
-    @Tag(name = "New Tenant Endpoint", description = "Public Endpoint for creating new Tenant in the SaaS platform")
-    public ResponseEntity<TenantDTO> updateTenant(@PathVariable("id") Long id ,
+    @PatchMapping("/{id}")
+    public ResponseEntity<TenantDto> updateTenant(@NotNull @PathVariable("id") Long id ,
                                                   @Valid @RequestBody CreateUpdateTenantDTO createUpdateTenantDTO,
-                                                  @AuthenticationPrincipal(expression = "claims['email']") String username){
+                                                  @AuthenticationPrincipal(expression = "claims['email']") String username,
+                                                  @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
 
-        TenantDTO updateTenantDto = this.tenantService.updateTenant(id, createUpdateTenantDTO, username);
+        if(validateIfTenantIDMatched(id, tenantId)) {
+            throw new Exception("Invalid Tenant Id");
+        }
+
+        TenantDto updateTenantDto = this.tenantService.updateTenant(id, createUpdateTenantDTO, username);
 
         if (updateTenantDto != null) {
             return new ResponseEntity<>(updateTenantDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
+    }
+
+    private boolean validateIfTenantIDMatched(Long tenantIDFromPath, String tenantIdFromPrincipal) {
+        return !Objects.equals(tenantIDFromPath, Long.parseLong(tenantIdFromPrincipal));
     }
 }

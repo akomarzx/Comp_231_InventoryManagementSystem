@@ -1,6 +1,7 @@
 package org.group4.comp231.inventorymanagementservice.dto.user;
 
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -16,6 +17,7 @@ public class UserRegistrationDto implements Serializable {
     private String lastName;
     @NotNull
     @NotBlank
+    @Email
     private String email;
     @NotNull
     @NotBlank

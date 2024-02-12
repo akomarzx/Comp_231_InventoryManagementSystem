@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/code")
 @SecurityRequirement(name = "Keycloak")
-@Tag(name = "Static Code", description = "Static Codes inside of the API")
+@Tag(name = "Static Code", description = "Static Codes API")
 public class StaticCodeController {
 
     private final StaticCodeService staticCodeService;
