@@ -21,11 +21,10 @@ public class UserService {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String baseOauthIssuerUri;
 
-    private final String adminRestAPIBaseURI = "https://ronaldjro.dev:8443/admin/realms/Com231_GroupProject";
+    @Value("${keycloak-admin-rest-api}")
+    private String adminRestAPIBaseURI ;
 
     public void registerNewTenant(UserRegistrationDto dto, Long tenantId) throws Exception {
-
-        boolean result = false;
 
         try {
 
@@ -96,7 +95,7 @@ public class UserService {
         keycloakUserRepresentationDto.setFirstName(dto.getFirstName());
         keycloakUserRepresentationDto.setLastName(dto.getLastName());
         keycloakUserRepresentationDto.setCredentialDtos(credentialDtoList);
-        keycloakUserRepresentationDto.setGroups(List.of("administrator"));
+        keycloakUserRepresentationDto.setGroups(List.of("administrator_group", "users"));
         keycloakUserRepresentationDto.setAttributes(Map.of("tenant_id", tenantId.toString()));
 
         return keycloakUserRepresentationDto;

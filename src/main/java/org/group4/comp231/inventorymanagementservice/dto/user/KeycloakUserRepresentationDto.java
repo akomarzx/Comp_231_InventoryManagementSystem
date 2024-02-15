@@ -1,11 +1,13 @@
 package org.group4.comp231.inventorymanagementservice.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+@JsonIgnoreProperties
 public class KeycloakUserRepresentationDto implements Serializable {
 
     @JsonProperty("enabled")
