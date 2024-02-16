@@ -50,7 +50,6 @@ public class TenantService {
     @Transactional(rollbackOn = {WebClientResponseException.class, Exception.class})
     public void createTenant(UserRegistrationDto dto) throws Exception {
 
-        String responseMessage = null;
         Tenant newTenant = new Tenant();
 
         newTenant.setCreatedBy(dto.getEmail());
@@ -61,11 +60,10 @@ public class TenantService {
         newTenant = this.tenantRepository.save(newTenant);
 
         //After Creating New Tenant - Create the new user in the IAM platform
-        this.userService.registerNewTenant(dto, newTenant.getId());
+        this.userService.registerNewUser(dto, newTenant.getId());
 
     }
 
-    // Todo: Update users info in keycloak as well.
     public TenantDto updateTenant(Long id, CreateUpdateTenantDTO dto, String username){
 
         Optional<Tenant> tenant = this.tenantRepository.findById(id);
