@@ -3,6 +3,8 @@ package org.group4.comp231.inventorymanagementservice.config;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,4 +40,11 @@ public class KeycloakClientConfig {
                 .build();
     }
 
+    public RealmResource realmRepresentation() {
+        return this.keycloak().realm(this.realm);
+    }
+
+    public UsersResource usersResource() {
+        return this.realmRepresentation().users();
+    }
 }

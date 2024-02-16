@@ -5,10 +5,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.ObjectUtils;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
+import org.group4.comp231.inventorymanagementservice.services.KeycloakClientService;
 import org.group4.comp231.inventorymanagementservice.services.TenantService;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/public")

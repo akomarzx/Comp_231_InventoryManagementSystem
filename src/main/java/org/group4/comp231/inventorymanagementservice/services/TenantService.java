@@ -20,12 +20,13 @@ public class TenantService {
 
     private final TenantRepository tenantRepository;
     private final TenantMapper tenantMapper;
-    private final UserService userService;
+    
+    private final KeycloakClientService keycloakClientService;
 
-    public TenantService(TenantRepository tenantRepository, TenantMapper tenantMapper, UserService userService) {
+    public TenantService(TenantRepository tenantRepository, TenantMapper tenantMapper, KeycloakClientService keycloakClientService) {
         this.tenantRepository = tenantRepository;
         this.tenantMapper = tenantMapper;
-        this.userService = userService;
+        this.keycloakClientService = keycloakClientService;
     }
 
     public  TenantDto getTenant(Long id) {
@@ -60,7 +61,7 @@ public class TenantService {
         newTenant = this.tenantRepository.save(newTenant);
 
         //After Creating New Tenant - Create the new user in the IAM platform
-        this.userService.registerNewUser(dto, newTenant.getId());
+        this.keycloakClientService.registerNewUser(dto, newTenant.getId(), true);
 
     }
 
