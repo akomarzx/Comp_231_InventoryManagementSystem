@@ -1,15 +1,18 @@
 package org.group4.comp231.inventorymanagementservice.mapper;
 
+import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDto;
 import org.group4.comp231.inventorymanagementservice.domain.Tenant;
-import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDTO;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TenantMapper {
-    Tenant toEntity(TenantDTO tenantDTO);
+    @Mapping(source = "companyName", target = "label")
+    Tenant toEntity(TenantDto tenantDto);
 
-    TenantDTO toDto(Tenant tenant);
+    @Mapping(source = "label", target = "companyName")
+    TenantDto toDto(Tenant tenant);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Tenant partialUpdate(TenantDTO tenantDTO, @MappingTarget Tenant tenant);
+    @Mapping(source = "companyName", target = "label")
+    Tenant partialUpdate(TenantDto tenantDto, @MappingTarget Tenant tenant);
 }

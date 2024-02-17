@@ -1,12 +1,14 @@
 package org.group4.comp231.inventorymanagementservice.dto.user;
 
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
+import java.util.List;
 
-public class UserRegistrationDto implements Serializable {
+public class UserRegistrationDto implements Serializable{
 
     @NotNull
     @NotBlank
@@ -16,6 +18,7 @@ public class UserRegistrationDto implements Serializable {
     private String lastName;
     @NotNull
     @NotBlank
+    @Email
     private String email;
     @NotNull
     @NotBlank
@@ -27,6 +30,8 @@ public class UserRegistrationDto implements Serializable {
     @NotNull
     @NotBlank
     private String companyName;
+
+    private List<Long> groupCodes;
 
     public UserRegistrationDto(String firstName, String lastName, String email, String username, String password, String companyName) {
         this.firstName = firstName;
@@ -86,5 +91,13 @@ public class UserRegistrationDto implements Serializable {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public List<Long> getGroupCodes() {
+        return groupCodes;
+    }
+
+    public void setGroupCodes(List<Long> groupCodes) {
+        this.groupCodes = groupCodes;
     }
 }

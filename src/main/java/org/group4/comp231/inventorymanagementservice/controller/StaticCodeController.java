@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/code")
 @SecurityRequirement(name = "Keycloak")
-@Tag(name = "Static Code", description = "Static Codes inside of the API")
+@Tag(name = "Static Code", description = "Static Codes API")
 public class StaticCodeController {
 
     private final StaticCodeService staticCodeService;
@@ -25,7 +25,7 @@ public class StaticCodeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CodeBook>> getAllStaticValues(){
+    public ResponseEntity<List<CodeBook>> getAllStaticValues() {
         List<CodeBook> valueList = this.staticCodeService.getAllStaticCode();
         return new ResponseEntity<>(valueList, HttpStatus.OK);
     }

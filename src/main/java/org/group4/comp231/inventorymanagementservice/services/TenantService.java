@@ -3,7 +3,7 @@ package org.group4.comp231.inventorymanagementservice.services;
 import jakarta.transaction.Transactional;
 import org.group4.comp231.inventorymanagementservice.domain.Tenant;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
-import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDTO;
+import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDto;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
 import org.group4.comp231.inventorymanagementservice.mapper.TenantMapper;
 import org.group4.comp231.inventorymanagementservice.repository.TenantRepository;
@@ -20,18 +20,26 @@ public class TenantService {
 
     private final TenantRepository tenantRepository;
     private final TenantMapper tenantMapper;
-    private final UserService userService;
+    
+    private final KeycloakClientService keycloakClientService;
 
-    public TenantService(TenantRepository tenantRepository, TenantMapper tenantMapper, UserService userService) {
+    public TenantService(TenantRepository tenantRepository, TenantMapper tenantMapper, KeycloakClientService keycloakClientService) {
         this.tenantRepository = tenantRepository;
         this.tenantMapper = tenantMapper;
-        this.userService = userService;
+        this.keycloakClientService = keycloakClientService;
     }
 
-    public List<TenantDTO> getAllTenants() {
+    public  TenantDto getTenant(Long id) {
+
+        Optional<Tenant> tenant = this.tenantRepository.findById(id);
+
+        return tenant.map(this.tenantMapper::toDto).orElse(null);
+    }
+
+    public List<TenantDto> getAllTenants() {
 
         List<Tenant> tenants = this.tenantRepository.findAll();
-        List<TenantDTO> tenantDTOList = new ArrayList<>();
+        List<TenantDto> tenantDTOList = new ArrayList<>();
 
         for (Tenant tenant : tenants) {
             tenantDTOList.add(this.tenantMapper.toDto(tenant));
@@ -43,21 +51,21 @@ public class TenantService {
     @Transactional(rollbackOn = {WebClientResponseException.class, Exception.class})
     public void createTenant(UserRegistrationDto dto) throws Exception {
 
-        String responseMessage = null;
         Tenant newTenant = new Tenant();
 
         newTenant.setCreatedBy(dto.getEmail());
         newTenant.setLabel(dto.getCompanyName());
         newTenant.setPrimaryEmail(dto.getEmail());
+        newTenant.setCreatedAt(Instant.now());
 
         newTenant = this.tenantRepository.save(newTenant);
 
         //After Creating New Tenant - Create the new user in the IAM platform
-        this.userService.registerNewTenant(dto, newTenant.getId());
+        this.keycloakClientService.registerNewUser(dto, newTenant.getId(), true);
 
     }
 
-    public TenantDTO updateTenant(Long id, CreateUpdateTenantDTO dto, String username){
+    public TenantDto updateTenant(Long id, CreateUpdateTenantDTO dto, String username){
 
         Optional<Tenant> tenant = this.tenantRepository.findById(id);
 
