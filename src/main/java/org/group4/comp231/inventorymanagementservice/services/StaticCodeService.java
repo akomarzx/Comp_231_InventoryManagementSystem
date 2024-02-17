@@ -29,7 +29,7 @@ public class StaticCodeService {
         return this.codeBook;
     }
 
-    public Optional<CodeBook> getAllGroupsCode() {
+    public Optional<CodeBook> getGroupsCodeValueList() {
         if(codeBook != null) {
             return this.codeBook.stream().filter(codeBook1 -> Objects.equals(codeBook1.getId(), CODEBOOK_GROUP_ID)).findFirst();
         }

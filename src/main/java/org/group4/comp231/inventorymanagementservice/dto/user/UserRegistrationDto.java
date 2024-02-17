@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.List;
 
-public class UserRegistrationDto implements Serializable {
+public class UserRegistrationDto implements Serializable{
 
     @NotNull
     @NotBlank
@@ -31,7 +31,6 @@ public class UserRegistrationDto implements Serializable {
     @NotBlank
     private String companyName;
 
-    @NotNull
     private List<Long> groupCodes;
 
     public UserRegistrationDto(String firstName, String lastName, String email, String username, String password, String companyName) {

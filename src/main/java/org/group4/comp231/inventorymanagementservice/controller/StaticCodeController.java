@@ -25,7 +25,7 @@ public class StaticCodeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CodeBook>> getAllStaticValues(){
+    public ResponseEntity<List<CodeBook>> getAllStaticValues() {
         List<CodeBook> valueList = this.staticCodeService.getAllStaticCode();
         return new ResponseEntity<>(valueList, HttpStatus.OK);
     }
