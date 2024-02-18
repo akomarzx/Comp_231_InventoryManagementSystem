@@ -1,6 +1,6 @@
 {
   "realm": "Com231_GroupProject",
-  "auth-server-url": "https://ronaldjro.dev:8443",
+  "auth-server-url": "",
   "resource": "",
   "credentials": {
     "secret": ""

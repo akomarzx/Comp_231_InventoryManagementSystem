@@ -57,6 +57,7 @@ public class SecurityConfig {
             config = JsonSerialization.readValue(getClass().getResourceAsStream("/policy-enforcer.json"), PolicyEnforcerConfig.class);
             config.getCredentials().put("secret", System.getenv("CLIENT_SECRET"));
             config.setResource(System.getenv("CLIENT"));
+            config.setAuthServerUrl(System.getenv("KEYCLOAK_BASE_URL"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
