@@ -13,6 +13,8 @@ insert into code_book (code_book_id, label, created_at, created_by, updated_at, 
 insert into code_book (code_book_id, label, created_at, created_by, updated_at, updated_by) values (40000, 'Document Type', current_timestamp(), 'System', null, null);
 insert into code_book (code_book_id, label, created_at, created_by, updated_at, updated_by) values (50000, 'Order Type', current_timestamp(), 'System', null, null);
 insert into code_book (code_book_id, label, created_at, created_by, updated_at, updated_by) values (60000, 'Account Type', current_timestamp(), 'System', null, null);
+insert into code_book (code_book_id, label, created_at, created_by, updated_at, updated_by) values (70000, 'Group', current_timestamp(), 'System', null, null);
+insert into code_book (code_book_id, label, created_at, created_by, updated_at, updated_by) values (80000, 'Role', current_timestamp(), 'System', null, null);
 
 create table if not exists `code_value` (
     code_value_id bigint primary key,
@@ -113,6 +115,16 @@ insert into code_value (code_value_id, code_book_id, label,created_at, created_b
 #Account Type
 insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('600010', 60000, 'Vendor Account',current_timestamp(), 'System');
 insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('600020', 60000, 'Customer Account',current_timestamp(), 'System');
+#Group
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('700010', 70000, 'administrator_group',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('700020', 70000, 'sales_group',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('700030', 70000, 'purchasing_group',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('700040', 70000, 'warehouse_group',current_timestamp(), 'System');
+#Roles
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('800010', 80000, 'administrator',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('800020', 80000, 'sales_staff',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('800030', 80000, 'purchasing_staff',current_timestamp(), 'System');
+insert into code_value (code_value_id, code_book_id, label,created_at, created_by) values ('800040', 80000, 'warehouse_staff',current_timestamp(), 'System');
 
 create index code_value_code_book_id_idx on code_value (code_book_id);
 
@@ -150,6 +162,7 @@ create table if not exists `category` (
     category_id bigint auto_increment primary key,
     tenant_id bigint not null,
     label varchar(255) not null,
+    description varchar(255),
     created_at timestamp not null default current_timestamp(),
     created_by varchar(255) not null,
     updated_at timestamp,
@@ -284,6 +297,7 @@ create table if not exists `order` (
     created_by varchar(255) not null,
     updated_at timestamp,
     updated_by varchar(255),
+    notes varchar(255),
     foreign key (order_type)
         references code_value (code_value_id)
         on update restrict
@@ -322,6 +336,7 @@ create table if not exists inventory (
     created_by varchar(255) not null,
     updated_at timestamp,
     updated_by varchar(255),
+    notes varchar(255),
     foreign key(product_id)
         references product (product_id)
         on update restrict
@@ -353,6 +368,7 @@ create table if not exists `order_item` (
     created_by varchar(255) not null,
     updated_at timestamp,
     updated_by varchar(255),
+    notes varchar(255),
     foreign key(product_id)
         references product (product_id)
         on update restrict

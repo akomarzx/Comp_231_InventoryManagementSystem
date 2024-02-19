@@ -1,6 +1,5 @@
 package org.group4.comp231.inventorymanagementservice.config;
 
-import lombok.Setter;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-@Setter
 @Component
 public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver<Long>, HibernatePropertiesCustomizer {
 
@@ -34,4 +32,7 @@ public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver
         hibernateProperties.put(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, this);
     }
 
+    public void setCurrentTenant(Long currentTenant) {
+        this.currentTenant = currentTenant;
+    }
 }
