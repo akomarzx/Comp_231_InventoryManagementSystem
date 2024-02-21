@@ -73,6 +73,7 @@ public class TenantService {
             return null;
         }
 
+        tenant.get().setPrimaryEmail(dto.email());
         tenant.get().setLabel(dto.companyName());
         tenant.get().setUpdatedAt(Instant.now());
         tenant.get().setUpdatedBy(username);
