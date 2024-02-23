@@ -8,7 +8,6 @@ import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
 import org.group4.comp231.inventorymanagementservice.mapper.warehouse.WarehouseMapper;
-import org.group4.comp231.inventorymanagementservice.repository.AddressRepository;
 import org.group4.comp231.inventorymanagementservice.repository.WarehouseRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +20,11 @@ import java.util.stream.Collectors;
 public class WarehouseService {
     private static final Log log = LogFactory.getLog(WarehouseService.class);
 
-    private final AddressRepository addressRepository;
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
     private final TenantIdentifierResolver tenantIdentifierResolver;
 
-    public WarehouseService(AddressRepository addressRepository, WarehouseRepository warehouseRepository, WarehouseMapper warehouseMapper, TenantIdentifierResolver tenantIdentifierResolver) {
-        this.addressRepository = addressRepository;
+    public WarehouseService(WarehouseRepository warehouseRepository, WarehouseMapper warehouseMapper, TenantIdentifierResolver tenantIdentifierResolver) {
         this.warehouseRepository = warehouseRepository;
         this.warehouseMapper = warehouseMapper;
         this.tenantIdentifierResolver = tenantIdentifierResolver;

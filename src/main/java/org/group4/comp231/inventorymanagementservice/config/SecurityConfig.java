@@ -58,6 +58,7 @@ public class SecurityConfig {
             config.getCredentials().put("secret", System.getenv("CLIENT_SECRET"));
             config.setResource(System.getenv("CLIENT"));
             config.setAuthServerUrl(System.getenv("KEYCLOAK_BASE_URL"));
+            config.setRealm(System.getenv("KEYCLOAK_REALM"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
