@@ -5,7 +5,7 @@ import org.group4.comp231.inventorymanagementservice.domain.Tenant;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDto;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
-import org.group4.comp231.inventorymanagementservice.mapper.TenantMapper;
+import org.group4.comp231.inventorymanagementservice.mapper.tenant.TenantMapper;
 import org.group4.comp231.inventorymanagementservice.repository.TenantRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClientResponseException;

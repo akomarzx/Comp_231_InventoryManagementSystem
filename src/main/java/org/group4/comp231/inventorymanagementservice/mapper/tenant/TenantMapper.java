@@ -1,4 +1,4 @@
-package org.group4.comp231.inventorymanagementservice.mapper;
+package org.group4.comp231.inventorymanagementservice.mapper.tenant;
 
 import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDto;
 import org.group4.comp231.inventorymanagementservice.domain.Tenant;

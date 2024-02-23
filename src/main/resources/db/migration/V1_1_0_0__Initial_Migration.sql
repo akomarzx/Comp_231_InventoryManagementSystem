@@ -226,9 +226,7 @@ create table if not exists `address` (
     foreign key (country_id)
         references code_value (code_value_id)
         on update restrict
-        on delete cascade,
-    check ( country_id between 10000 and 19999),
-    check ( province_id between 20000 and 29999)
+        on delete cascade
 )ENGINE=INNODB;
 
 create index address_tenant_id_idx on address (tenant_id);
@@ -278,8 +276,7 @@ create table if not exists  `account` (
       foreign key (address_id)
           references address (address_id)
           on update restrict
-          on delete cascade,
-      check ( account_type between 60000 and 69999)
+          on delete cascade
 )ENGINE=INNODB;
 
 create index account_tenant_id_idx on account (tenant_id);
@@ -313,9 +310,7 @@ create table if not exists `order` (
     foreign key (account_id)
         references account (account_id)
         on update restrict
-        on delete cascade,
-    check ( order_type between 50000 and 59999),
-    check ( order_status between 30000 and 39999)
+        on delete cascade
 ) Engine=INNODB;
 
 create index order_tenant_id_idx on `order` (tenant_id);

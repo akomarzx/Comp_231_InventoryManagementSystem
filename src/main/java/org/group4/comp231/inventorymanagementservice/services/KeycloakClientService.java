@@ -133,7 +133,7 @@ public class KeycloakClientService {
     private List<String> getGroupNameByCode(List<Long> codeValueIdList) {
         List<String> groupNames = new ArrayList<>();
         for (Long groupCode : codeValueIdList) {
-            CodeValue value = this.staticCodeService.getGroupsCodeValueList().get().getCodeValues().stream()
+            CodeValue value = this.staticCodeService.getGCodeValueListUsingCodeBookID(this.staticCodeService.CODEBOOK_GROUP_ID).get().getCodeValues().stream()
                     .filter(cv -> Objects.equals(cv.getId(), groupCode))
                     .findAny().get();
 
