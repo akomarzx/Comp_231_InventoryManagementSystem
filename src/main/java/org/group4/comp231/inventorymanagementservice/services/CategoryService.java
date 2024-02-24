@@ -1,12 +1,12 @@
 package org.group4.comp231.inventorymanagementservice.services;
 
 import jakarta.validation.constraints.NotNull;
-import org.group4.comp231.inventorymanagementservice.mapper.category.CategoryMapper;
+import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.category.Category;
 import org.group4.comp231.inventorymanagementservice.dto.category.CategoryDto;
-import org.group4.comp231.inventorymanagementservice.dto.category.CreateUpdateCategoryDto;
-import org.group4.comp231.inventorymanagementservice.mapper.category.GetCategoryMapper;
+import org.group4.comp231.inventorymanagementservice.dto.category.CreateCategoryDto;
+import org.group4.comp231.inventorymanagementservice.mapper.category.CategoryMapper;
 import org.group4.comp231.inventorymanagementservice.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +19,12 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final TenantIdentifierResolver tenantIdentifierResolver;
-    private final GetCategoryMapper getCategoryMapper;
     private final CategoryMapper categoryMapper;
 
     public CategoryService(CategoryRepository categoryRepository, TenantIdentifierResolver tenantIdentifierResolver,
-                           GetCategoryMapper getCategoryMapper, CategoryMapper categoryMapper) {
+                            CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
         this.tenantIdentifierResolver = tenantIdentifierResolver;
-        this.getCategoryMapper = getCategoryMapper;
         this.categoryMapper = categoryMapper;
     }
 
@@ -35,7 +33,7 @@ public class CategoryService {
         return this.categoryRepository.findBy();
     }
 
-    public void createCategory(CreateUpdateCategoryDto createUpdateCategoryDto, Long tenantId, String createdBy) {
+    public void createCategory(CreateCategoryDto createUpdateCategoryDto, Long tenantId, String createdBy) {
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
         Category newCategory = this.categoryMapper.partialUpdate(createUpdateCategoryDto, new Category());
         newCategory.setTenant(tenantId);
@@ -44,7 +42,7 @@ public class CategoryService {
         this.categoryRepository.save(newCategory);
     }
 
-    public CategoryDto updateCategory(Long categoryId ,CreateUpdateCategoryDto dto, Long tenantId, String updatedBy) {
+    public CategoryDto updateCategory(Long categoryId, UpdateCategoryDto dto, Long tenantId, String updatedBy) {
 
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
         Optional<Category> category = this.categoryRepository.findById(categoryId);
@@ -54,10 +52,10 @@ public class CategoryService {
             Category entity = this.categoryMapper.partialUpdate(dto, category.get());
             entity.setUpdatedBy(updatedBy);
             entity.setUpdatedAt(Instant.now());
-            entity.setLabel(dto.label());
 
             this.categoryRepository.save(entity);
-            return this.getCategoryMapper.toDto(entity);
+            return this.categoryMapper.toCategoryDto(entity);
+
         } else {
             return null;
         }

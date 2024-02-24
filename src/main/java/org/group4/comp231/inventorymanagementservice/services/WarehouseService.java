@@ -4,9 +4,11 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
+import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
+import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
+import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
 import org.group4.comp231.inventorymanagementservice.mapper.warehouse.WarehouseMapper;
 import org.group4.comp231.inventorymanagementservice.repository.WarehouseRepository;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,7 @@ public class WarehouseService {
         return warehouses.stream().map(warehouseMapper::toDto).collect(Collectors.toList());
     }
 
-    public void createWarehouse(WarehouseDto dto, Long tenantId, String createdBy) {
+    public void createWarehouse(CreateWarehouseDto dto, Long tenantId, String createdBy) {
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
         Warehouse newWarehouse = this.warehouseMapper.partialUpdate(dto, new Warehouse());
         newWarehouse.getAddress().setTenant(tenantId);
@@ -46,12 +48,11 @@ public class WarehouseService {
         newWarehouse.setTenant(tenantId);
         newWarehouse.setCreatedBy(createdBy);
         newWarehouse.setCreatedAt(Instant.now());
-        log.info(newWarehouse.getAddress().toString());
         this.warehouseRepository.save(newWarehouse);
     }
 
     @Transactional
-    public WarehouseDto updateCategory(Long categoryId, WarehouseDto dto, Long tenantId, String updatedBy) {
+    public WarehouseDto updateWarehouse(Long categoryId, UpdateWarehouseDto dto, Long tenantId, String updatedBy) {
 
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
         Optional<Warehouse> category = this.warehouseRepository.findById(categoryId);
@@ -63,7 +64,6 @@ public class WarehouseService {
             entity.getAddress().setUpdatedBy(updatedBy);
             entity.setUpdatedBy(updatedBy);
             entity.setUpdatedAt(Instant.now());
-            entity.setLabel(dto.label());
 
             this.warehouseRepository.save(entity);
 

@@ -9,18 +9,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @ControllerAdvice
 public class RestGlobalExceptionHandler {
 
     @ExceptionHandler(value = {MethodArgumentNotValidException.class})
-    public ResponseEntity<ErrorMessage> invalidRequestBody(MethodArgumentNotValidException ex, WebRequest request) {
-        ErrorMessage message = new ErrorMessage(
-                HttpStatus.BAD_REQUEST.value(),
-                LocalDateTime.now(),
-                ex.getAllErrors().toString());
-        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Map<String, String>> invalidRequestBody(MethodArgumentNotValidException ex, WebRequest request) {
+        Map<String, String> validationErrorMessage = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
+            validationErrorMessage.put(fieldError.getField(), fieldError.getDefaultMessage());
+        });
+
+        return new ResponseEntity<>(validationErrorMessage, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = {Exception.class})

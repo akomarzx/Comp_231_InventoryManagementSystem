@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
+import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
 import org.group4.comp231.inventorymanagementservice.services.WarehouseService;
 import org.springframework.http.HttpStatus;
@@ -32,14 +34,14 @@ public class WarehouseController {
 
     @GetMapping
     @Operation(description = "Get All Warehouse for user")
-    public ResponseEntity<List<WarehouseDto>> getAllCategories(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public ResponseEntity<List<WarehouseDto>> getAllWarehouse(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
         return new ResponseEntity<>(this.warehouseService.getWarehouse(Long.parseLong(tenantId)), HttpStatus.OK);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Create new warehouse")
-    public ResponseEntity<ObjectUtils.Null> createCategory(@Valid @RequestBody WarehouseDto createWarehouseDto,
+    public ResponseEntity<ObjectUtils.Null> createWarehouse(@Valid @RequestBody CreateWarehouseDto createWarehouseDto,
                                                            @AuthenticationPrincipal(expression = "claims['email']") String createdBy,
                                                            @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
 
@@ -50,12 +52,12 @@ public class WarehouseController {
 
     @PutMapping("/{id}")
     @Operation(description = "Update existing warehouse")
-    public ResponseEntity<WarehouseDto> updateCategory(@Valid @RequestBody WarehouseDto updateWarehouseDto,
+    public ResponseEntity<WarehouseDto> updateWarehouse(@Valid @RequestBody UpdateWarehouseDto updateWarehouseDto,
                                                       @NotNull @PathVariable("id") Long id,
                                                       @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
                                                       @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
 
-        WarehouseDto warehouseDto = this.warehouseService.updateCategory(id, updateWarehouseDto, Long.parseLong(tenantId), updatedBy);
+        WarehouseDto warehouseDto = this.warehouseService.updateWarehouse(id, updateWarehouseDto, Long.parseLong(tenantId), updatedBy);
 
         if (warehouseDto != null) {
             return new ResponseEntity<>(warehouseDto, HttpStatus.OK);

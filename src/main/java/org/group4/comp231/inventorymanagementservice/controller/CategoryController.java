@@ -6,8 +6,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
+import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.dto.category.CategoryDto;
-import org.group4.comp231.inventorymanagementservice.dto.category.CreateUpdateCategoryDto;
+import org.group4.comp231.inventorymanagementservice.dto.category.CreateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.services.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/category")
@@ -38,7 +38,7 @@ public class CategoryController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Create new Category")
-    public ResponseEntity<ObjectUtils.Null> createCategory(@Valid @RequestBody CreateUpdateCategoryDto createUpdateCategoryDto,
+    public ResponseEntity<ObjectUtils.Null> createCategory(@Valid @RequestBody CreateCategoryDto createUpdateCategoryDto,
                                                            @AuthenticationPrincipal(expression = "claims['email']") String createdBy,
                                                            @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
         this.categoryService.createCategory(createUpdateCategoryDto, Long.parseLong(tenantId), createdBy);
@@ -47,12 +47,12 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     @Operation(description = "Update existing category")
-    public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody CreateUpdateCategoryDto createUpdateCategoryDto,
+    public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody UpdateCategoryDto updateCategoryDto,
                                                       @NotNull @PathVariable("id") Long id,
                                                       @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
                                                       @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
 
-        CategoryDto categoryDto = this.categoryService.updateCategory(id ,createUpdateCategoryDto, Long.parseLong(tenantId), updatedBy);
+        CategoryDto categoryDto = this.categoryService.updateCategory(id, updateCategoryDto, Long.parseLong(tenantId), updatedBy);
 
         if (categoryDto != null) {
             return new ResponseEntity<>(categoryDto, HttpStatus.OK);
