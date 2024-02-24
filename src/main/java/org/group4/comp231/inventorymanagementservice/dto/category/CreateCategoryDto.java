@@ -8,6 +8,6 @@ import java.io.Serializable;
 /**
  * DTO for {@link org.group4.comp231.inventorymanagementservice.domain.category.Category}
  */
-public record CreateUpdateCategoryDto(@NotNull @Size(max = 255) String label,
-                                      @Size(max = 255) String description) implements Serializable {
+public record CreateCategoryDto(@NotNull @Size(max = 255) String label,
+                                @Size(max = 255) String description) implements Serializable {
 }
