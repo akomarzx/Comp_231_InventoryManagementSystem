@@ -9,6 +9,7 @@ import org.group4.comp231.inventorymanagementservice.domain.Account;
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
+import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
@@ -26,7 +27,6 @@ import java.util.stream.Collectors;
 @Service
 public class AccountService {
     private static final Log log = LogFactory.getLog(AccountService.class);
-
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final TenantIdentifierResolver tenantIdentifierResolver;
@@ -57,25 +57,29 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountDto updateAccount(Long categoryId, UpdateWarehouseDto dto, Long tenantId, String updatedBy) {
+    public AccountDto updateAccount(Long categoryId, UpdateAccountDto dto, Long tenantId, String updatedBy) {
 
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        Optional<Warehouse> category = this.warehouseRepository.findById(categoryId);
+        Optional<Account> account = this.accountRepository.findById(categoryId);
 
-        if (category.isPresent()) {
+        if (account.isPresent()) {
 
-            Warehouse entity = this.warehouseMapper.partialUpdate(dto, category.get());
+            Account entity = this.accountMapper.partialUpdate(dto, account.get());
             entity.getAddress().setUpdatedAt(Instant.now());
             entity.getAddress().setUpdatedBy(updatedBy);
             entity.setUpdatedBy(updatedBy);
             entity.setUpdatedAt(Instant.now());
 
-            this.warehouseRepository.save(entity);
+            this.accountRepository.save(entity);
 
-            return this.warehouseMapper.toDto(entity);
+            return this.accountMapper.toDto(entity);
 
         } else {
             return null;
         }
+    }
+
+    public void deleteAccount(Long id) {
+        this.accountRepository.deleteById(id);
     }
 }

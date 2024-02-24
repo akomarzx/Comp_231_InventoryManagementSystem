@@ -1,7 +1,5 @@
 package org.group4.comp231.inventorymanagementservice.dto.account;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import org.group4.comp231.inventorymanagementservice.dto.address.AddressDto;
 
 import java.io.Serializable;

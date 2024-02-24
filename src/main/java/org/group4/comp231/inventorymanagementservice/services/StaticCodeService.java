@@ -15,7 +15,8 @@ public class StaticCodeService {
     private List<CodeBook> codeBook;
 
     public final Long CODEBOOK_COUNTRY_ID = 10000L;
-    public  final Long CODEBOOK_PROVINCE_ID = 20000L;
+    public final Long CODEBOOK_PROVINCE_ID = 20000L;
+    public final Long ACCOUNT_TYPE_ID = 60000L;
     public final Long CODEBOOK_GROUP_ID = 70000L;
 
     public StaticCodeService(CodeBookRepository codeBookRepository) {

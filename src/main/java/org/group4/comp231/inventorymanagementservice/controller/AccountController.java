@@ -6,6 +6,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
+import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
+import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
+import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.category.CategoryDto;
 import org.group4.comp231.inventorymanagementservice.dto.category.CreateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;
@@ -36,31 +39,31 @@ public class AccountController {
 
     @GetMapping
     @Operation(description = "Get All Accounts")
-    public ResponseEntity<List<CategoryDto>> getAllAccount(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
-        return new ResponseEntity<>(this.categoryService.getCategories(Long.parseLong(tenantId)), HttpStatus.OK);
+    public ResponseEntity<List<AccountDto>> getAllAccount(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+        return new ResponseEntity<>(this.accountService.getAllAccount(Long.parseLong(tenantId)), HttpStatus.OK);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Create new Seller/Vendor Account")
-    public ResponseEntity<ObjectUtils.Null> createAccount(@Valid @RequestBody CreateCategoryDto createUpdateCategoryDto,
-                                                           @AuthenticationPrincipal(expression = "claims['email']") String createdBy,
-                                                           @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
-        this.categoryService.createCategory(createUpdateCategoryDto, Long.parseLong(tenantId), createdBy);
+    public ResponseEntity<ObjectUtils.Null> createAccount(@Valid @RequestBody CreateAccountDto accountDto,
+                                                          @AuthenticationPrincipal(expression = "claims['email']") String createdBy,
+                                                          @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+        this.accountService.createAccount(accountDto, Long.parseLong(tenantId), createdBy);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     @Operation(description = "Update Existing Vendor/Seller Information")
-    public ResponseEntity<CategoryDto> updateAccount(@Valid @RequestBody UpdateCategoryDto updateCategoryDto,
-                                                      @NotNull @PathVariable("id") Long id,
-                                                      @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
-                                                      @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public ResponseEntity<AccountDto> updateAccount(@Valid @RequestBody UpdateAccountDto dto,
+                                                    @NotNull @PathVariable("id") Long id,
+                                                    @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
+                                                    @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
 
-        CategoryDto categoryDto = this.categoryService.updateCategory(id, updateCategoryDto, Long.parseLong(tenantId), updatedBy);
+        AccountDto accountDto = this.accountService.updateAccount(id, dto, Long.parseLong(tenantId), updatedBy);
 
-        if (categoryDto != null) {
-            return new ResponseEntity<>(categoryDto, HttpStatus.OK);
+        if (accountDto != null) {
+            return new ResponseEntity<>(accountDto, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
@@ -69,7 +72,7 @@ public class AccountController {
     @DeleteMapping("/{id}")
     @Operation(description = "Delete a Vendor/Seller Account")
     public ResponseEntity<ObjectUtils.Null> deleteAccount(@NotNull @PathVariable("id") String accountId) {
-        this.keycloakClientService.deleteUser(userId);
+        this.accountService.deleteAccount(Long.parseLong(accountId));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
