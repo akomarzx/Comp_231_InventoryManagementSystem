@@ -13,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("/public")
 @Tag(name = "Public API", description = "All Public APIs available")
@@ -40,4 +38,5 @@ public class PublicController {
     public String uploadFile(@RequestParam("file") MultipartFile file) {
         return awss3Service.uploadFile(file.getOriginalFilename(), file);
     }
+
 }
