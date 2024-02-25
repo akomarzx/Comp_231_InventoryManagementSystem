@@ -1,4 +1,4 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
 import org.group4.comp231.inventorymanagementservice.domain.Tenant;
@@ -49,7 +49,7 @@ public class TenantService {
     }
 
     @Transactional(rollbackOn = {WebClientResponseException.class, Exception.class})
-    public void createTenant(UserRegistrationDto dto) throws Exception {
+    public void createTenant(UserRegistrationDto dto) {
 
         Tenant newTenant = new Tenant();
 

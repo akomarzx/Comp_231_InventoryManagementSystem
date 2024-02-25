@@ -4,10 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.james.mime4j.dom.datetime.DateTime;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
-import org.group4.comp231.inventorymanagementservice.services.AWSS3Service;
-import org.group4.comp231.inventorymanagementservice.services.TenantService;
+import org.group4.comp231.inventorymanagementservice.service.AWSS3Service;
+import org.group4.comp231.inventorymanagementservice.service.TenantService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/public")
@@ -39,7 +37,7 @@ public class PublicController {
     }
 
     @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public String uploadFile(@RequestParam("file") MultipartFile file) throws IOException {
+    public String uploadFile(@RequestParam("file") MultipartFile file) {
         return awss3Service.uploadFile(file.getOriginalFilename(), file);
     }
 }

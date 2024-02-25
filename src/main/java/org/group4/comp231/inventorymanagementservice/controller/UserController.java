@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserUpdateDto;
-import org.group4.comp231.inventorymanagementservice.services.KeycloakClientService;
+import org.group4.comp231.inventorymanagementservice.service.KeycloakClientService;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

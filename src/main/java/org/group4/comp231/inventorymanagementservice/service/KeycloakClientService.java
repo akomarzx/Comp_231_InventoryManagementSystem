@@ -1,4 +1,4 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.core.Response;
@@ -96,6 +96,7 @@ public class KeycloakClientService {
 
         keycloakUserRepresentationDto.setUsername(dto.getUsername());
         keycloakUserRepresentationDto.setEmail(dto.getEmail());
+        keycloakUserRepresentationDto.setEmailVerified(true);
         keycloakUserRepresentationDto.setEnabled(true);
         keycloakUserRepresentationDto.setFirstName(dto.getFirstName());
         keycloakUserRepresentationDto.setLastName(dto.getLastName());
@@ -105,6 +106,7 @@ public class KeycloakClientService {
             keycloakUserRepresentationDto.setGroups(List.of("administrator_group"));
         } else {
             keycloakUserRepresentationDto.setGroups(getGroupNameByCode(dto.getGroupCodes()));
+            keycloakUserRepresentationDto.setRequiredActions(List.of("UPDATE_PASSWORD"));
         }
 
         keycloakUserRepresentationDto.setAttributes(Map.of("tenant_id", Collections.singletonList(tenantId.toString())));

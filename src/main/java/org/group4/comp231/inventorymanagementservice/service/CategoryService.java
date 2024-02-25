@@ -1,4 +1,4 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.validation.constraints.NotNull;
 import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;

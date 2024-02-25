@@ -1,4 +1,4 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
@@ -6,17 +6,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Account;
-import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
 import org.group4.comp231.inventorymanagementservice.mapper.account.AccountMapper;
-import org.group4.comp231.inventorymanagementservice.mapper.warehouse.WarehouseMapper;
 import org.group4.comp231.inventorymanagementservice.repository.AccountRepository;
-import org.group4.comp231.inventorymanagementservice.repository.WarehouseRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;

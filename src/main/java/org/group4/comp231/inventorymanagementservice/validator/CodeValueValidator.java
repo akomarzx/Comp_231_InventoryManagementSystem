@@ -6,9 +6,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.annotation.ValidateCodeID;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeBook;
-import org.group4.comp231.inventorymanagementservice.services.StaticCodeService;
+import org.group4.comp231.inventorymanagementservice.service.StaticCodeService;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
