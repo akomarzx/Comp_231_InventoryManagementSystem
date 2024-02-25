@@ -22,7 +22,6 @@ import java.util.*;
 public class KeycloakClientService {
 
     private static final Log log = LogFactory.getLog(KeycloakClientService.class);
-
     private final KeycloakClientConfig clientConfig;
     private final StaticCodeService staticCodeService;
 
