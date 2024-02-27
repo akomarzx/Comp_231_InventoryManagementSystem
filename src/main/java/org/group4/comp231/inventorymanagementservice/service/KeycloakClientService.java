@@ -19,9 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class KeycloakClientService {
-
-    private static final Log log = LogFactory.getLog(KeycloakClientService.class);
+public class KeycloakClientService extends BaseService{
     private final KeycloakClientConfig clientConfig;
     private final StaticCodeService staticCodeService;
 

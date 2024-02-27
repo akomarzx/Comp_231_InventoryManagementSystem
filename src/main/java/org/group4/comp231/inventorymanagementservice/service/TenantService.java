@@ -16,11 +16,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TenantService {
+public class TenantService extends BaseService {
 
     private final TenantRepository tenantRepository;
     private final TenantMapper tenantMapper;
-    
     private final KeycloakClientService keycloakClientService;
 
     public TenantService(TenantRepository tenantRepository, TenantMapper tenantMapper, KeycloakClientService keycloakClientService) {

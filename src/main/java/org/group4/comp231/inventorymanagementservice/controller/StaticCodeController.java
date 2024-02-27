@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/code")
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Static Code", description = "Static Codes API")
-public class StaticCodeController {
+public class StaticCodeController extends BaseController{
 
     private final StaticCodeService staticCodeService;
 

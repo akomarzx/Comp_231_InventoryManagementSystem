@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.UUID;
 
 @Service
-public class AWSS3Service {
+public class AWSS3Service extends BaseService {
 
     private static final Log log = LogFactory.getLog(KeycloakClientService.class);
     private final AmazonS3 s3client;

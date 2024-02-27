@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping(path = "/user")
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "User Management", description = "Endpoints for User Management")
-public class UserController {
+public class UserController extends BaseController{
 
     private final KeycloakClientService keycloakClientService;
 

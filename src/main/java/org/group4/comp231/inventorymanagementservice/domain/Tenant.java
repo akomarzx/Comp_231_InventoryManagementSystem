@@ -3,8 +3,7 @@ package org.group4.comp231.inventorymanagementservice.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import org.hibernate.annotations.TenantId;
 
 import java.time.Instant;
 
@@ -14,6 +13,7 @@ import java.time.Instant;
 })
 public class Tenant {
     @Id
+    @TenantId
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tenant_id", nullable = false)
     private Long id;

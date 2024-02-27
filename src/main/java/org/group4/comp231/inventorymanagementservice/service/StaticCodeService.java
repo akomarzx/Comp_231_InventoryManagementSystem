@@ -9,11 +9,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class StaticCodeService {
+public class StaticCodeService extends BaseService {
 
     private final CodeBookRepository codeBookRepository;
     private List<CodeBook> codeBook;
-
     public final Long CODEBOOK_COUNTRY_ID = 10000L;
     public final Long CODEBOOK_PROVINCE_ID = 20000L;
     public final Long ACCOUNT_TYPE_ID = 60000L;

@@ -6,11 +6,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
+import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseInfo;
 import org.group4.comp231.inventorymanagementservice.service.WarehouseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,8 @@ import java.util.List;
 @RequestMapping("/warehouse")
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Warehouse/Locations", description = "Endpoints for managing customer's location")
-public class WarehouseController {
+public class WarehouseController extends BaseController {
 
-    private static final Log log = LogFactory.getLog(WarehouseController.class);
     private final WarehouseService warehouseService;
 
     public WarehouseController(WarehouseService warehouseService) {
@@ -34,7 +32,7 @@ public class WarehouseController {
 
     @GetMapping
     @Operation(description = "Get All Warehouse for user")
-    public ResponseEntity<List<WarehouseDto>> getAllWarehouse(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public ResponseEntity<List<WarehouseInfo>> getAllWarehouse(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
         return new ResponseEntity<>(this.warehouseService.getWarehouse(Long.parseLong(tenantId)), HttpStatus.OK);
     }
 

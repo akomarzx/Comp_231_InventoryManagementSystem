@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
+import org.group4.comp231.inventorymanagementservice.dto.account.AccountSummaryInfo;
 import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
 import org.group4.comp231.inventorymanagementservice.service.AccountService;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequestMapping(path = "/account")
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Account", description = "Endpoints for Managing Vendor and Seller Account")
-public class AccountController {
+public class AccountController extends BaseController {
 
     private final AccountService accountService;
 
@@ -31,7 +32,7 @@ public class AccountController {
 
     @GetMapping
     @Operation(description = "Get All Accounts")
-    public ResponseEntity<List<AccountDto>> getAllAccount(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public ResponseEntity<List<AccountSummaryInfo>> getAllAccount(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
         return new ResponseEntity<>(this.accountService.getAllAccount(Long.parseLong(tenantId)), HttpStatus.OK);
     }
 

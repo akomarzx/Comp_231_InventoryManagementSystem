@@ -3,11 +3,10 @@ package org.group4.comp231.inventorymanagementservice.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.group4.comp231.inventorymanagementservice.domain.category.Category;
-import org.group4.comp231.inventorymanagementservice.domain.category.ProductCategory;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.TenantId;
 
 import java.math.BigDecimal;
@@ -69,6 +68,7 @@ public class Product {
             name = "product_category",
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
+    @Fetch(FetchMode.JOIN)
     private Set<Category> productCategories = new LinkedHashSet<>();
 
     public Long getId() {

@@ -21,7 +21,7 @@ import java.util.List;
 @RequestMapping("/category")
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Product Category", description = "Endpoints for managing product category")
-public class CategoryController {
+public class CategoryController extends BaseController{
 
     private final CategoryService categoryService;
 

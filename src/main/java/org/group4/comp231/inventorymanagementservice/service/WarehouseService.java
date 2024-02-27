@@ -2,13 +2,12 @@ package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
+import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseInfo;
 import org.group4.comp231.inventorymanagementservice.mapper.warehouse.WarehouseMapper;
 import org.group4.comp231.inventorymanagementservice.repository.WarehouseRepository;
 import org.springframework.stereotype.Service;
@@ -19,9 +18,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class WarehouseService {
-    private static final Log log = LogFactory.getLog(WarehouseService.class);
-
+public class WarehouseService extends BaseService {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
     private final TenantIdentifierResolver tenantIdentifierResolver;
@@ -33,10 +30,9 @@ public class WarehouseService {
     }
 
     @Transactional
-    public List<WarehouseDto> getWarehouse(@NotNull Long tenantId) {
+    public List<WarehouseInfo> getWarehouse(@NotNull Long tenantId) {
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        List<Warehouse> warehouses = this.warehouseRepository.findAll();
-        return warehouses.stream().map(warehouseMapper::toDto).collect(Collectors.toList());
+        return this.warehouseRepository.findAllBy();
     }
 
     public void createWarehouse(CreateWarehouseDto dto, Long tenantId, String createdBy) {

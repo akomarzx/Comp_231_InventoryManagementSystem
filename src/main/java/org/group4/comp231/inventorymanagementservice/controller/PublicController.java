@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/public")
 @Tag(name = "Public API", description = "All Public APIs available")
-public class PublicController {
+public class PublicController extends BaseController {
 
     private final TenantService tenantService;
     private final AWSS3Service awss3Service;

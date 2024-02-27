@@ -2,11 +2,10 @@ package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Account;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
+import org.group4.comp231.inventorymanagementservice.dto.account.AccountSummaryInfo;
 import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
 import org.group4.comp231.inventorymanagementservice.mapper.account.AccountMapper;
@@ -16,11 +15,9 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-public class AccountService {
-    private static final Log log = LogFactory.getLog(AccountService.class);
+public class AccountService extends BaseService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final TenantIdentifierResolver tenantIdentifierResolver;
@@ -32,10 +29,9 @@ public class AccountService {
     }
 
     @Transactional
-    public List<AccountDto> getAllAccount(@NotNull Long tenantId) {
+    public List<AccountSummaryInfo> getAllAccount(@NotNull Long tenantId) {
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        List<Account> warehouses = this.accountRepository.findAll();
-        return warehouses.stream().map(accountMapper::toDto).collect(Collectors.toList());
+        return this.accountRepository.findAllBy();
     }
 
     public void createAccount(CreateAccountDto dto, Long tenantId, String createdBy) {
