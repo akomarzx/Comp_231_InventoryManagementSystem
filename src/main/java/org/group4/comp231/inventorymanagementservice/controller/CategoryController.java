@@ -6,8 +6,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
+import org.group4.comp231.inventorymanagementservice.dto.category.CategorySummary;
 import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;
-import org.group4.comp231.inventorymanagementservice.dto.category.CategoryDto;
 import org.group4.comp231.inventorymanagementservice.dto.category.CreateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.service.CategoryService;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ public class CategoryController extends BaseController{
 
     @GetMapping
     @Operation(description = "Get All Categories")
-    public ResponseEntity<List<CategoryDto>> getAllCategories(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public ResponseEntity<List<CategorySummary>> getAllCategories(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
         return new ResponseEntity<>(this.categoryService.getCategories(Long.parseLong(tenantId)), HttpStatus.OK);
     }
 
@@ -47,17 +47,12 @@ public class CategoryController extends BaseController{
 
     @PutMapping("/{id}")
     @Operation(description = "Update existing category")
-    public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody UpdateCategoryDto updateCategoryDto,
-                                                      @NotNull @PathVariable("id") Long id,
-                                                      @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
-                                                      @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public ResponseEntity<ObjectUtils.Null> updateCategory(@Valid @RequestBody UpdateCategoryDto updateCategoryDto,
+                                                           @NotNull @PathVariable("id") Long id,
+                                                           @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
+                                                           @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
 
-        CategoryDto categoryDto = this.categoryService.updateCategory(id, updateCategoryDto, Long.parseLong(tenantId), updatedBy);
-
-        if (categoryDto != null) {
-            return new ResponseEntity<>(categoryDto, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        this.categoryService.updateCategory(id, updateCategoryDto, Long.parseLong(tenantId), updatedBy);
+        return ResponseEntity.noContent().build();
     }
 }

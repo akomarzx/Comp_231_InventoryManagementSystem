@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Account;
-import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountSummaryInfo;
 import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
@@ -47,7 +46,7 @@ public class AccountService extends BaseService {
     }
 
     @Transactional
-    public AccountDto updateAccount(Long categoryId, UpdateAccountDto dto, Long tenantId, String updatedBy) {
+    public void updateAccount(Long categoryId, UpdateAccountDto dto, Long tenantId, String updatedBy) throws Exception {
 
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
         Optional<Account> account = this.accountRepository.findById(categoryId);
@@ -61,11 +60,8 @@ public class AccountService extends BaseService {
             entity.setUpdatedAt(Instant.now());
 
             this.accountRepository.save(entity);
-
-            return this.accountMapper.toDto(entity);
-
         } else {
-            return null;
+            throw new Exception("Entity not found");
         }
     }
 

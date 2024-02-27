@@ -1,10 +1,10 @@
 package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.validation.constraints.NotNull;
+import org.group4.comp231.inventorymanagementservice.dto.category.CategorySummary;
 import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.category.Category;
-import org.group4.comp231.inventorymanagementservice.dto.category.CategoryDto;
 import org.group4.comp231.inventorymanagementservice.dto.category.CreateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.mapper.category.CategoryMapper;
 import org.group4.comp231.inventorymanagementservice.repository.CategoryRepository;
@@ -28,9 +28,9 @@ public class CategoryService extends BaseService {
         this.categoryMapper = categoryMapper;
     }
 
-    public List<CategoryDto> getCategories(@NotNull Long tenantId) {
+    public List<CategorySummary> getCategories(@NotNull Long tenantId) {
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        return this.categoryRepository.findBy();
+        return this.categoryRepository.findAllBy();
     }
 
     public void createCategory(CreateCategoryDto createUpdateCategoryDto, Long tenantId, String createdBy) {
@@ -42,7 +42,7 @@ public class CategoryService extends BaseService {
         this.categoryRepository.save(newCategory);
     }
 
-    public CategoryDto updateCategory(Long categoryId, UpdateCategoryDto dto, Long tenantId, String updatedBy) {
+    public void updateCategory(Long categoryId, UpdateCategoryDto dto, Long tenantId, String updatedBy) throws Exception {
 
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
         Optional<Category> category = this.categoryRepository.findById(categoryId);
@@ -54,10 +54,8 @@ public class CategoryService extends BaseService {
             entity.setUpdatedAt(Instant.now());
 
             this.categoryRepository.save(entity);
-            return this.categoryMapper.toCategoryDto(entity);
-
         } else {
-            return null;
+            throw new Exception("Entity Not Found");
         }
     }
 }

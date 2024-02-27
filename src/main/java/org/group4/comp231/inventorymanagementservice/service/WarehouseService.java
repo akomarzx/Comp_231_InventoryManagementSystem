@@ -6,7 +6,6 @@ import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierReso
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseInfo;
 import org.group4.comp231.inventorymanagementservice.mapper.warehouse.WarehouseMapper;
 import org.group4.comp231.inventorymanagementservice.repository.WarehouseRepository;
@@ -48,7 +47,7 @@ public class WarehouseService extends BaseService {
     }
 
     @Transactional
-    public WarehouseDto updateWarehouse(Long categoryId, UpdateWarehouseDto dto, Long tenantId, String updatedBy) {
+    public void updateWarehouse(Long categoryId, UpdateWarehouseDto dto, Long tenantId, String updatedBy) throws Exception {
 
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
         Optional<Warehouse> category = this.warehouseRepository.findById(categoryId);
@@ -63,10 +62,8 @@ public class WarehouseService extends BaseService {
 
             this.warehouseRepository.save(entity);
 
-            return this.warehouseMapper.toDto(entity);
-
         } else {
-            return null;
+            throw new Exception("Entity not found");
         }
     }
 }

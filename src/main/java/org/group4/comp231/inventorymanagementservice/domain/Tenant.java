@@ -12,8 +12,8 @@ import java.time.Instant;
         @Index(name = "label", columnList = "label", unique = true)
 })
 public class Tenant {
+
     @Id
-    @TenantId
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tenant_id", nullable = false)
     private Long id;

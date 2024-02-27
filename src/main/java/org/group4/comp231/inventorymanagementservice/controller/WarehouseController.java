@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseInfo;
 import org.group4.comp231.inventorymanagementservice.service.WarehouseService;
 import org.springframework.http.HttpStatus;
@@ -50,17 +49,12 @@ public class WarehouseController extends BaseController {
 
     @PutMapping("/{id}")
     @Operation(description = "Update existing warehouse")
-    public ResponseEntity<WarehouseDto> updateWarehouse(@Valid @RequestBody UpdateWarehouseDto updateWarehouseDto,
-                                                      @NotNull @PathVariable("id") Long id,
-                                                      @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
-                                                      @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public ResponseEntity<ObjectUtils.Null> updateWarehouse(@Valid @RequestBody UpdateWarehouseDto updateWarehouseDto,
+                                                            @NotNull @PathVariable("id") Long id,
+                                                            @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
+                                                            @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
 
-        WarehouseDto warehouseDto = this.warehouseService.updateWarehouse(id, updateWarehouseDto, Long.parseLong(tenantId), updatedBy);
-
-        if (warehouseDto != null) {
-            return new ResponseEntity<>(warehouseDto, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+       this.warehouseService.updateWarehouse(id, updateWarehouseDto, Long.parseLong(tenantId), updatedBy);
+        return ResponseEntity.noContent().build();
     }
 }

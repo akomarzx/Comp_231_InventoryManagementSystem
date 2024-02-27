@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
-import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountSummaryInfo;
 import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
@@ -48,18 +47,14 @@ public class AccountController extends BaseController {
 
     @PutMapping("/{id}")
     @Operation(description = "Update Existing Vendor/Seller Information")
-    public ResponseEntity<AccountDto> updateAccount(@Valid @RequestBody UpdateAccountDto dto,
-                                                    @NotNull @PathVariable("id") Long id,
-                                                    @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
-                                                    @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public ResponseEntity<ObjectUtils.Null> updateAccount(@Valid @RequestBody UpdateAccountDto dto,
+                                                          @NotNull @PathVariable("id") Long id,
+                                                          @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
+                                                          @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
 
-        AccountDto accountDto = this.accountService.updateAccount(id, dto, Long.parseLong(tenantId), updatedBy);
+        this.accountService.updateAccount(id, dto, Long.parseLong(tenantId), updatedBy);
 
-        if (accountDto != null) {
-            return new ResponseEntity<>(accountDto, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
