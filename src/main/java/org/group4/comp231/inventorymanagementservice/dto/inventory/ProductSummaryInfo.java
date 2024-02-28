@@ -7,6 +7,7 @@ import java.util.Set;
  * Projection for {@link org.group4.comp231.inventorymanagementservice.domain.Product}
  */
 public interface ProductSummaryInfo {
+
     Long getId();
 
     Long getUpi();

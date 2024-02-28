@@ -10,8 +10,6 @@ import org.hibernate.Hibernate;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Getter
-@Setter
 @Embeddable
 public class ProductCategoryId implements Serializable {
     private static final long serialVersionUID = -8864355511274237041L;
@@ -42,4 +40,27 @@ public class ProductCategoryId implements Serializable {
         return Objects.hash(productId, tenantId, categoryId);
     }
 
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Long getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(Long tenantId) {
+        this.tenantId = tenantId;
+    }
 }

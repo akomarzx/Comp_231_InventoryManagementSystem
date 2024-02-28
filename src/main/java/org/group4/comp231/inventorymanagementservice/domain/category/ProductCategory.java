@@ -11,11 +11,10 @@ import lombok.Setter;
 
 import java.time.Instant;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "product_category")
 public class ProductCategory {
+
     @EmbeddedId
     private ProductCategoryId id;
 
@@ -35,4 +34,43 @@ public class ProductCategory {
     @Column(name = "updated_by")
     private String updatedBy;
 
+    public ProductCategoryId getId() {
+        return id;
+    }
+
+    public void setId(ProductCategoryId id) {
+        this.id = id;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
 }

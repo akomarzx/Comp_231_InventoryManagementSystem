@@ -35,7 +35,7 @@ public class KeycloakClientService extends BaseService{
 
         try(Response response = usersResource.create(userRepresentation)) {
             log.info("Creating new User: " + response.getStatus());
-            if (response.getStatus() != HttpStatus.CREATED.value()) {
+            if(response.getStatus() != HttpStatus.CREATED.value()) {
                 throw new Exception("Failed to register new user." + "IAM StatusCode: " + response.getStatus());
             }
         } catch (Exception e) {
@@ -61,10 +61,11 @@ public class KeycloakClientService extends BaseService{
 
         UserRepresentation updateRepresentation = new UserRepresentation();
 
-        if (userUpdateDto.getFirstName() != null) {
+        if(userUpdateDto.getFirstName() != null) {
             updateRepresentation.setFirstName(userUpdateDto.getFirstName());
         }
-        if (userUpdateDto.getLastName() != null) {
+
+        if(userUpdateDto.getLastName() != null) {
             updateRepresentation.setLastName(userUpdateDto.getLastName());
         }
 
@@ -100,7 +101,7 @@ public class KeycloakClientService extends BaseService{
         keycloakUserRepresentationDto.setLastName(dto.getLastName());
         keycloakUserRepresentationDto.setCredentials(List.of(credentialRepresentation));
 
-        if (newCustomerRegistration) {
+        if(newCustomerRegistration) {
             keycloakUserRepresentationDto.setGroups(List.of("administrator_group"));
         } else {
             keycloakUserRepresentationDto.setGroups(getGroupNameByCode(dto.getGroupCodes()));
