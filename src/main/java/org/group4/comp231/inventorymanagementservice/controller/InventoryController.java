@@ -4,10 +4,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.ObjectUtils;
+import org.group4.comp231.inventorymanagementservice.domain.ViewProductSummary;
 import org.group4.comp231.inventorymanagementservice.dto.inventory.CreateInventoryDto;
-import org.group4.comp231.inventorymanagementservice.dto.inventory.InventorySummaryInfo;
-import org.group4.comp231.inventorymanagementservice.dto.inventory.ProductSummaryInfo;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.service.InventoryService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -28,9 +26,9 @@ public class InventoryController extends BaseController {
     }
 
     @GetMapping
-    public Page<InventorySummaryInfo> getAllProduct(@RequestParam int page,
-                                                    @RequestParam int size,
-                                                    @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public Page<ViewProductSummary> getAllProduct(@RequestParam int page,
+                                                  @RequestParam int size,
+                                                  @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
 
         return this.inventoryService.getProduct(page, size, Long.parseLong(tenantId));
     }
@@ -40,7 +38,7 @@ public class InventoryController extends BaseController {
                                                             @AuthenticationPrincipal(expression = "claims['email']") String createdBy,
                                                             @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
 
-        this.inventoryService.createInventory(createInventoryDto, createdBy, Long.parseLong(tenantId), null);
+        this.inventoryService.createInventory(createInventoryDto, createdBy, Long.parseLong(tenantId), 1L);
 
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }

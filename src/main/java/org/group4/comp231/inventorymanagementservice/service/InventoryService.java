@@ -5,16 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Inventory;
 import org.group4.comp231.inventorymanagementservice.domain.Product;
+import org.group4.comp231.inventorymanagementservice.domain.ViewProductSummary;
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
 import org.group4.comp231.inventorymanagementservice.domain.category.ProductCategory;
 import org.group4.comp231.inventorymanagementservice.domain.category.ProductCategoryId;
 import org.group4.comp231.inventorymanagementservice.dto.inventory.CreateInventoryDto;
-import org.group4.comp231.inventorymanagementservice.dto.inventory.InventorySummaryInfo;
-import org.group4.comp231.inventorymanagementservice.dto.inventory.ProductSummaryInfo;
-import org.group4.comp231.inventorymanagementservice.repository.InventoryRepository;
-import org.group4.comp231.inventorymanagementservice.repository.ProductCategoryRepository;
-import org.group4.comp231.inventorymanagementservice.repository.ProductRepository;
-import org.group4.comp231.inventorymanagementservice.repository.WarehouseRepository;
+import org.group4.comp231.inventorymanagementservice.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,18 +29,20 @@ public class InventoryService extends BaseService{
     private final TenantIdentifierResolver tenantIdentifierResolver;
     private final ProductCategoryRepository productCategoryRepository;
     private final WarehouseRepository warehouseRepository;
-    public InventoryService(ProductRepository productRepository, InventoryRepository inventoryRepository, TenantIdentifierResolver tenantIdentifierResolver, ProductCategoryRepository productCategoryRepository, WarehouseRepository warehouseRepository) {
+    private final ViewProductSummaryRepository viewProductListRepository;
+    public InventoryService(ProductRepository productRepository, InventoryRepository inventoryRepository, TenantIdentifierResolver tenantIdentifierResolver, ProductCategoryRepository productCategoryRepository, WarehouseRepository warehouseRepository, ViewProductSummaryRepository viewProductListRepository) {
         this.productRepository = productRepository;
         this.inventoryRepository = inventoryRepository;
         this.tenantIdentifierResolver = tenantIdentifierResolver;
         this.productCategoryRepository = productCategoryRepository;
         this.warehouseRepository = warehouseRepository;
+        this.viewProductListRepository = viewProductListRepository;
     }
 
-    public Page<InventorySummaryInfo> getProduct(int page, int size, Long tenantId) {
+    public Page<ViewProductSummary> getProduct(int page, int size, Long tenantId) {
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
         Pageable pageRequest = PageRequest.of(page, size);
-        return this.inventoryRepository.findAllBy(pageRequest);
+        return this.viewProductListRepository.findAllBy(pageRequest);
     }
 
     @Transactional
