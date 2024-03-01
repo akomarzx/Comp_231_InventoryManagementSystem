@@ -31,19 +31,18 @@ public class WarehouseController extends BaseController {
 
     @GetMapping
     @Operation(description = "Get All Warehouse for user")
-    public ResponseEntity<List<WarehouseInfo>> getAllWarehouse(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
-        return new ResponseEntity<>(this.warehouseService.getWarehouse(Long.parseLong(tenantId)), HttpStatus.OK);
+    public ResponseEntity<List<WarehouseInfo>> getAllWarehouse() {
+        return new ResponseEntity<>(this.warehouseService.getWarehouse(), HttpStatus.OK);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Create new warehouse")
     public ResponseEntity<ObjectUtils.Null> createWarehouse(@Valid @RequestBody CreateWarehouseDto createWarehouseDto,
-                                                           @AuthenticationPrincipal(expression = "claims['email']") String createdBy,
-                                                           @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+                                                           @AuthenticationPrincipal(expression = "claims['email']") String createdBy) {
 
         log.info(createWarehouseDto.toString());
-        this.warehouseService.createWarehouse(createWarehouseDto, Long.parseLong(tenantId), createdBy);
+        this.warehouseService.createWarehouse(createWarehouseDto, createdBy);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
@@ -51,10 +50,9 @@ public class WarehouseController extends BaseController {
     @Operation(description = "Update existing warehouse")
     public ResponseEntity<ObjectUtils.Null> updateWarehouse(@Valid @RequestBody UpdateWarehouseDto updateWarehouseDto,
                                                             @NotNull @PathVariable("id") Long id,
-                                                            @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
-                                                            @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
+                                                            @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
 
-       this.warehouseService.updateWarehouse(id, updateWarehouseDto, Long.parseLong(tenantId), updatedBy);
-        return ResponseEntity.noContent().build();
+       this.warehouseService.updateWarehouse(id, updateWarehouseDto, updatedBy);
+       return ResponseEntity.noContent().build();
     }
 }

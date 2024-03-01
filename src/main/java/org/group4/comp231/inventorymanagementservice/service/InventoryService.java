@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,16 +38,16 @@ public class InventoryService extends BaseService{
         this.viewProductListRepository = viewProductListRepository;
     }
 
-    public Page<ViewProductSummary> getProduct(int page, int size, Long tenantId) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
+    public Page<ViewProductSummary> getProduct(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         return this.viewProductListRepository.findAllBy(pageRequest);
     }
 
     @Transactional
-    public void createInventory(CreateInventoryDto createInventoryDto, String createdBy, Long tenantId, Long existingProductId) throws Exception {
+    public void createInventory(CreateInventoryDto createInventoryDto, String createdBy, Long existingProductId) throws Exception {
 
         Product product = null;
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
 
         if(createInventoryDto.productCategoryIds().size() > 5) {
             throw new Exception("Too many categories");
@@ -82,8 +81,6 @@ public class InventoryService extends BaseService{
     }
 
     private Product mapProductFromRequest(CreateInventoryDto createInventoryDto, Long tenantId, String createdBy) {
-
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
 
         Product product = new Product();
         product.setTenant(tenantId);

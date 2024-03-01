@@ -14,12 +14,17 @@ public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver
 
     @Override
     public Long resolveCurrentTenantIdentifier() {
-        return currentTenant;
+        currentTenant = TenantContext.getCurrentTenant();
+        if(currentTenant != null) {
+            return currentTenant;
+        } else {
+            return 0L;
+        }
     }
 
     @Override
     public boolean validateExistingCurrentSessions() {
-        return false;
+        return true;
     }
 
     @Override

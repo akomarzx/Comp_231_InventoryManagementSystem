@@ -1,7 +1,6 @@
 package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class WarehouseService extends BaseService {
@@ -29,13 +27,12 @@ public class WarehouseService extends BaseService {
     }
 
     @Transactional
-    public List<WarehouseInfo> getWarehouse(@NotNull Long tenantId) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
+    public List<WarehouseInfo> getWarehouse() {
         return this.warehouseRepository.findAllBy();
     }
 
-    public void createWarehouse(CreateWarehouseDto dto, Long tenantId, String createdBy) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
+    public void createWarehouse(CreateWarehouseDto dto, String createdBy) {
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         Warehouse newWarehouse = this.warehouseMapper.partialUpdate(dto, new Warehouse());
         newWarehouse.getAddress().setTenant(tenantId);
         newWarehouse.getAddress().setCreatedAt(Instant.now());
@@ -47,10 +44,11 @@ public class WarehouseService extends BaseService {
     }
 
     @Transactional
-    public void updateWarehouse(Long categoryId, UpdateWarehouseDto dto, Long tenantId, String updatedBy) throws Exception {
+    public void updateWarehouse(Long categoryId, UpdateWarehouseDto dto, String updatedBy) throws Exception {
 
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        Optional<Warehouse> category = this.warehouseRepository.findById(categoryId);
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
+
+        Optional<Warehouse> category = this.warehouseRepository.findByTenantAndId(tenantId, categoryId);
 
         if(category.isPresent()) {
 

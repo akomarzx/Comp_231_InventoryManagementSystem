@@ -2,8 +2,6 @@ package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.core.Response;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.config.KeycloakClientConfig;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeValue;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
@@ -57,6 +55,7 @@ public class KeycloakClientService extends BaseService{
     }
 
     public void updateUser(@NotNull String userId, @NotNull UserUpdateDto userUpdateDto, Long tenantId) {
+
         UsersResource usersResource = this.clientConfig.usersResource();
 
         UserRepresentation updateRepresentation = new UserRepresentation();
@@ -114,6 +113,7 @@ public class KeycloakClientService extends BaseService{
     }
 
     private void updateUserGroups(List<String> groupNames, UserResource userResource) {
+
         List<GroupRepresentation> existingGroupsInRealm = this.clientConfig.realmRepresentation().groups().groups();
         List<GroupRepresentation> usersExistingGroups = userResource.groups();
 

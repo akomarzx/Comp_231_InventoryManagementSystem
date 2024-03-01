@@ -31,17 +31,16 @@ public class AccountController extends BaseController {
 
     @GetMapping
     @Operation(description = "Get All Accounts")
-    public ResponseEntity<List<AccountSummaryInfo>> getAllAccount(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
-        return new ResponseEntity<>(this.accountService.getAllAccount(Long.parseLong(tenantId)), HttpStatus.OK);
+    public ResponseEntity<List<AccountSummaryInfo>> getAllAccount() {
+        return new ResponseEntity<>(this.accountService.getAllAccount(), HttpStatus.OK);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Create new Seller/Vendor Account")
     public ResponseEntity<ObjectUtils.Null> createAccount(@Valid @RequestBody CreateAccountDto accountDto,
-                                                          @AuthenticationPrincipal(expression = "claims['email']") String createdBy,
-                                                          @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
-        this.accountService.createAccount(accountDto, Long.parseLong(tenantId), createdBy);
+                                                          @AuthenticationPrincipal(expression = "claims['email']") String createdBy) {
+        this.accountService.createAccount(accountDto, createdBy);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
@@ -49,10 +48,9 @@ public class AccountController extends BaseController {
     @Operation(description = "Update Existing Vendor/Seller Information")
     public ResponseEntity<ObjectUtils.Null> updateAccount(@Valid @RequestBody UpdateAccountDto dto,
                                                           @NotNull @PathVariable("id") Long id,
-                                                          @AuthenticationPrincipal(expression = "claims['email']") String updatedBy,
-                                                          @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
+                                                          @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
 
-        this.accountService.updateAccount(id, dto, Long.parseLong(tenantId), updatedBy);
+        this.accountService.updateAccount(id, dto, updatedBy);
 
         return ResponseEntity.noContent().build();
     }

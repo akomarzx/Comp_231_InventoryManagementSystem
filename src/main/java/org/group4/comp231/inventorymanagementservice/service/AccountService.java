@@ -1,7 +1,6 @@
 package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Account;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountSummaryInfo;
@@ -28,13 +27,12 @@ public class AccountService extends BaseService {
     }
 
     @Transactional
-    public List<AccountSummaryInfo> getAllAccount(@NotNull Long tenantId) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
+    public List<AccountSummaryInfo> getAllAccount() {
         return this.accountRepository.findAllBy();
     }
 
-    public void createAccount(CreateAccountDto dto, Long tenantId, String createdBy) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
+    public void createAccount(CreateAccountDto dto, String createdBy) {
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         Account newAccount = this.accountMapper.partialUpdate(dto, new Account());
         newAccount.getAddress().setTenant(tenantId);
         newAccount.getAddress().setCreatedAt(Instant.now());
@@ -46,10 +44,11 @@ public class AccountService extends BaseService {
     }
 
     @Transactional
-    public void updateAccount(Long categoryId, UpdateAccountDto dto, Long tenantId, String updatedBy) throws Exception {
+    public void updateAccount(Long categoryId, UpdateAccountDto dto, String updatedBy) throws Exception {
 
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        Optional<Account> account = this.accountRepository.findById(categoryId);
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
+
+        Optional<Account> account = this.accountRepository.findByTenantAndId(tenantId, categoryId);
 
         if (account.isPresent()) {
 

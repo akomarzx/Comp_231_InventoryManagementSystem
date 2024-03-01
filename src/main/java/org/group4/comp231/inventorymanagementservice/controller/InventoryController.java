@@ -27,18 +27,16 @@ public class InventoryController extends BaseController {
 
     @GetMapping
     public Page<ViewProductSummary> getAllProduct(@RequestParam int page,
-                                                  @RequestParam int size,
-                                                  @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+                                                  @RequestParam int size) {
 
-        return this.inventoryService.getProduct(page, size, Long.parseLong(tenantId));
+        return this.inventoryService.getProduct(page, size);
     }
 
     @PostMapping
     public ResponseEntity<ObjectUtils.Null> createInventory(@Valid @RequestBody CreateInventoryDto createInventoryDto,
-                                                            @AuthenticationPrincipal(expression = "claims['email']") String createdBy,
-                                                            @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
+                                                            @AuthenticationPrincipal(expression = "claims['email']") String createdBy) throws Exception {
 
-        this.inventoryService.createInventory(createInventoryDto, createdBy, Long.parseLong(tenantId), 1L);
+        this.inventoryService.createInventory(createInventoryDto, createdBy, null);
 
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
