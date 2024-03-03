@@ -3,9 +3,8 @@ package org.group4.comp231.inventorymanagementservice.service;
 import jakarta.transaction.Transactional;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Account;
+import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountSummaryInfo;
-import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
-import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
 import org.group4.comp231.inventorymanagementservice.mapper.account.AccountMapper;
 import org.group4.comp231.inventorymanagementservice.repository.AccountRepository;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,7 @@ public class AccountService extends BaseService {
         return this.accountRepository.findAllBy();
     }
 
-    public void createAccount(CreateAccountDto dto, String createdBy) {
+    public void createAccount(AccountDto dto, String createdBy) {
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         Account newAccount = this.accountMapper.partialUpdate(dto, new Account());
         newAccount.getAddress().setTenant(tenantId);
@@ -44,7 +43,7 @@ public class AccountService extends BaseService {
     }
 
     @Transactional
-    public void updateAccount(Long categoryId, UpdateAccountDto dto, String updatedBy) throws Exception {
+    public void updateAccount(Long categoryId, AccountDto dto, String updatedBy) throws Exception {
 
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
 
@@ -65,6 +64,14 @@ public class AccountService extends BaseService {
     }
 
     public void deleteAccount(Long id) {
+
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
+
+        Optional<Account> toBeDeleted = this.accountRepository.findByTenantAndId(tenantId, id);
+        if (toBeDeleted.isEmpty()) {
+            return;
+        }
+
         this.accountRepository.deleteById(id);
     }
 }

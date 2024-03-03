@@ -1,24 +1,16 @@
 package org.group4.comp231.inventorymanagementservice.mapper.category;
 
-import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.domain.Category;
-import org.group4.comp231.inventorymanagementservice.dto.category.CreateCategoryDto;
+import org.group4.comp231.inventorymanagementservice.dto.category.CategoryDto;
 import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CategoryMapper {
-    Category toEntity(CreateCategoryDto createCategoryDto);
+    Category toEntity(CategoryDto categoryDto);
 
-    CreateCategoryDto toCreateCategoryDto(Category category);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Category partialUpdate(CreateCategoryDto createCategoryDto, @MappingTarget Category category);
-
-    Category toEntity(UpdateCategoryDto updateCategoryDto);
-
-    UpdateCategoryDto toUpdateCategoryDto(Category category);
+    CategoryDto toCreateCategoryDto(Category category);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Category partialUpdate(UpdateCategoryDto updateCategoryDto, @MappingTarget Category category);
+    Category partialUpdate(CategoryDto categoryDto, @MappingTarget Category category);
 
 }

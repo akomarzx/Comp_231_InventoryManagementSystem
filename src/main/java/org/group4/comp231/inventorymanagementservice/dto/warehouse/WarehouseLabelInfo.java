@@ -5,4 +5,6 @@ package org.group4.comp231.inventorymanagementservice.dto.warehouse;
  */
 public interface WarehouseLabelInfo {
     String getLabel();
+
+    Long getId();
 }

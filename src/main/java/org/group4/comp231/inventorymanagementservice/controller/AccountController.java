@@ -6,13 +6,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
+import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountSummaryInfo;
-import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
-import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
 import org.group4.comp231.inventorymanagementservice.service.AccountService;
+import org.group4.comp231.inventorymanagementservice.utility.ValidationGroups.Create;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class AccountController extends BaseController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(description = "Create new Seller/Vendor Account")
-    public ResponseEntity<ObjectUtils.Null> createAccount(@Valid @RequestBody CreateAccountDto accountDto,
+    public ResponseEntity<ObjectUtils.Null> createAccount(@Validated(Create.class) @RequestBody AccountDto accountDto,
                                                           @AuthenticationPrincipal(expression = "claims['email']") String createdBy) {
         this.accountService.createAccount(accountDto, createdBy);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
@@ -46,7 +47,7 @@ public class AccountController extends BaseController {
 
     @PutMapping("/{id}")
     @Operation(description = "Update Existing Vendor/Seller Information")
-    public ResponseEntity<ObjectUtils.Null> updateAccount(@Valid @RequestBody UpdateAccountDto dto,
+    public ResponseEntity<ObjectUtils.Null> updateAccount(@Valid @RequestBody AccountDto dto,
                                                           @NotNull @PathVariable("id") Long id,
                                                           @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
 
@@ -59,6 +60,6 @@ public class AccountController extends BaseController {
     @Operation(description = "Delete a Vendor/Seller Account")
     public ResponseEntity<ObjectUtils.Null> deleteAccount(@NotNull @PathVariable("id") String accountId) {
         this.accountService.deleteAccount(Long.parseLong(accountId));
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.noContent().build();
     }
 }

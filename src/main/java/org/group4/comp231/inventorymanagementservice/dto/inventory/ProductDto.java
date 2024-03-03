@@ -11,7 +11,8 @@ import java.math.BigDecimal;
 /**
  * DTO for {@link org.group4.comp231.inventorymanagementservice.domain.Product}
  */
-public record ProductDto(@NotNull(groups = Update.class) String sku,Long upi, @NotNull(groups = Create.class) BigDecimal price,
-                         @NotNull(groups = Create.class) @Size(max = 255) String label,
-                         @Size(max = 255) String imageUrl) implements Serializable {
+public record ProductDto(@NotNull(groups = Update.class) String sku, Long upi, @NotNull(groups = Create.class) BigDecimal purchasePrice,
+                         @NotNull(groups = Create.class) @Size(max = 255) String label, @Size(max = 255) String description,
+                         @Size(max = 255) String imageUrl, @NotNull(groups = Create.class) Long categoryId,
+                         BigDecimal sellingPrice) implements Serializable {
 }

@@ -3,8 +3,7 @@ package org.group4.comp231.inventorymanagementservice.service;
 import jakarta.transaction.Transactional;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
+import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseInfo;
 import org.group4.comp231.inventorymanagementservice.mapper.warehouse.WarehouseMapper;
 import org.group4.comp231.inventorymanagementservice.repository.WarehouseRepository;
@@ -31,7 +30,7 @@ public class WarehouseService extends BaseService {
         return this.warehouseRepository.findAllBy();
     }
 
-    public void createWarehouse(CreateWarehouseDto dto, String createdBy) {
+    public void createWarehouse(WarehouseDto dto, String createdBy) {
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         Warehouse newWarehouse = this.warehouseMapper.partialUpdate(dto, new Warehouse());
         newWarehouse.getAddress().setTenant(tenantId);
@@ -44,7 +43,7 @@ public class WarehouseService extends BaseService {
     }
 
     @Transactional
-    public void updateWarehouse(Long categoryId, UpdateWarehouseDto dto, String updatedBy) throws Exception {
+    public void updateWarehouse(Long categoryId, WarehouseDto dto, String updatedBy) throws Exception {
 
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
 
@@ -63,5 +62,10 @@ public class WarehouseService extends BaseService {
         } else {
             throw new Exception("Entity not found");
         }
+    }
+
+    @Transactional
+    public void deleteWarehouse(Long id) {
+        this.warehouseRepository.deleteById(id);
     }
 }

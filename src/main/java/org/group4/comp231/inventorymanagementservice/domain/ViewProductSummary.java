@@ -30,9 +30,6 @@ public class ViewProductSummary {
     @Column(name = "upi")
     private Long upi;
 
-    @Column(name = "price", precision = 10)
-    private BigDecimal price;
-
     @Size(max = 255)
     @NotNull
     @Column(name = "label", nullable = false)
@@ -61,6 +58,29 @@ public class ViewProductSummary {
     @Column(name = "sku", nullable = false)
     private String sku;
 
+    @Column(name = "purchase_price", precision = 10)
+    private BigDecimal purchasePrice;
+
+    @NotNull
+    @Column(name = "selling_price", nullable = false, precision = 10)
+    private BigDecimal sellingPrice;
+
+    @Size(max = 255)
+    @Column(name = "description")
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public BigDecimal getSellingPrice() {
+        return sellingPrice;
+    }
+
+    public BigDecimal getPurchasePrice() {
+        return purchasePrice;
+    }
+
     public String getSku() {
         return sku;
     }
@@ -87,14 +107,6 @@ public class ViewProductSummary {
 
     public void setUpi(Long upi) {
         this.upi = upi;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
     }
 
     public String getLabel() {
