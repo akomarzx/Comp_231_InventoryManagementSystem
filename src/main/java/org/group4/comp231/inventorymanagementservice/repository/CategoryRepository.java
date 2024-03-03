@@ -1,6 +1,6 @@
 package org.group4.comp231.inventorymanagementservice.repository;
 
-import org.group4.comp231.inventorymanagementservice.domain.category.Category;
+import org.group4.comp231.inventorymanagementservice.domain.Category;
 import org.group4.comp231.inventorymanagementservice.dto.category.CategorySummary;
 import org.springframework.data.jpa.repository.JpaRepository;
 

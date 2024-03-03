@@ -3,7 +3,7 @@ package org.group4.comp231.inventorymanagementservice.service;
 import org.group4.comp231.inventorymanagementservice.dto.category.CategorySummary;
 import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
-import org.group4.comp231.inventorymanagementservice.domain.category.Category;
+import org.group4.comp231.inventorymanagementservice.domain.Category;
 import org.group4.comp231.inventorymanagementservice.dto.category.CreateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.mapper.category.CategoryMapper;
 import org.group4.comp231.inventorymanagementservice.repository.CategoryRepository;

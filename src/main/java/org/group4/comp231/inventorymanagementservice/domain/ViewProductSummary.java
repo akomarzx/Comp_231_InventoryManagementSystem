@@ -16,6 +16,7 @@ import java.time.Instant;
 @Immutable
 @Table(name = "view_product_summary")
 public class ViewProductSummary {
+
     @Id
     @NotNull
     @Column(name = "id", nullable = false)
@@ -52,9 +53,17 @@ public class ViewProductSummary {
     @Column(name = "locations")
     private String locations;
 
-    @Lob
-    @Column(name = "categories")
+    @Column(name = "category_label")
     private String categories;
+
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "sku", nullable = false)
+    private String sku;
+
+    public String getSku() {
+        return sku;
+    }
 
     public Long getId() {
         return id;

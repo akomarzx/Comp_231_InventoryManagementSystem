@@ -1,7 +1,7 @@
 package org.group4.comp231.inventorymanagementservice.mapper.category;
 
 import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;
-import org.group4.comp231.inventorymanagementservice.domain.category.Category;
+import org.group4.comp231.inventorymanagementservice.domain.Category;
 import org.group4.comp231.inventorymanagementservice.dto.category.CreateCategoryDto;
 import org.mapstruct.*;
 

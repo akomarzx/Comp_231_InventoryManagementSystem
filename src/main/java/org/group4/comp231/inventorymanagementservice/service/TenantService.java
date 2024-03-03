@@ -1,6 +1,7 @@
 package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
+import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Tenant;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDto;

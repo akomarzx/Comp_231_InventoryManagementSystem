@@ -3,24 +3,18 @@ package org.group4.comp231.inventorymanagementservice.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.ToString;
-import org.group4.comp231.inventorymanagementservice.domain.category.Category;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.TenantId;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
+@Getter
+@Setter
 @Entity
-@Table(name = "product", indexes = {
-        @Index(name = "upi", columnList = "upi", unique = true),
-        @Index(name = "product_tenant_id_idx", columnList = "tenant_id"),
-        @Index(name = "product_upi_idx", columnList = "upi")
-})
-@ToString
+@Table(name = "product")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +22,6 @@ public class Product {
     private Long id;
 
     @NotNull
-    @TenantId
     @Column(name = "tenant_id", nullable = false)
     private Long tenant;
 
@@ -63,99 +56,15 @@ public class Product {
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @ManyToMany
-    @JoinTable(
-            name = "product_category",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
-    @Fetch(FetchMode.JOIN)
-    private Set<Category> productCategories = new LinkedHashSet<>();
+    @NotNull
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
-    public Long getId() {
-        return id;
-    }
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "sku", nullable = false)
+    private String sku;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getTenant() {
-        return tenant;
-    }
-
-    public void setTenant(Long tenant) {
-        this.tenant = tenant;
-    }
-
-    public Long getUpi() {
-        return upi;
-    }
-
-    public void setUpi(Long upi) {
-        this.upi = upi;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-    public Set<Category> getProductCategories() {
-        return productCategories;
-    }
-
-    public void setProductCategories(Set<Category> productCategories) {
-        this.productCategories = productCategories;
-    }
 }

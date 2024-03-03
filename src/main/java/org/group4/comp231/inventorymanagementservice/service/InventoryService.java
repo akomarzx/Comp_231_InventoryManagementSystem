@@ -7,16 +7,16 @@ import org.group4.comp231.inventorymanagementservice.domain.Inventory;
 import org.group4.comp231.inventorymanagementservice.domain.Product;
 import org.group4.comp231.inventorymanagementservice.domain.ViewProductSummary;
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
-import org.group4.comp231.inventorymanagementservice.domain.category.ProductCategory;
-import org.group4.comp231.inventorymanagementservice.domain.category.ProductCategoryId;
-import org.group4.comp231.inventorymanagementservice.dto.inventory.CreateInventoryDto;
+import org.group4.comp231.inventorymanagementservice.dto.inventory.InventoryDto;
+import org.group4.comp231.inventorymanagementservice.mapper.inventory.InventoryMapper;
+import org.group4.comp231.inventorymanagementservice.mapper.inventory.ProductMapper;
 import org.group4.comp231.inventorymanagementservice.repository.*;
+import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -26,16 +26,16 @@ public class InventoryService extends BaseService{
     private final ProductRepository productRepository;
     private final InventoryRepository inventoryRepository;
     private final TenantIdentifierResolver tenantIdentifierResolver;
-    private final ProductCategoryRepository productCategoryRepository;
     private final WarehouseRepository warehouseRepository;
     private final ViewProductSummaryRepository viewProductListRepository;
-    public InventoryService(ProductRepository productRepository, InventoryRepository inventoryRepository, TenantIdentifierResolver tenantIdentifierResolver, ProductCategoryRepository productCategoryRepository, WarehouseRepository warehouseRepository, ViewProductSummaryRepository viewProductListRepository) {
+    private final CategoryRepository categoryRepository;
+    public InventoryService(ProductRepository productRepository, InventoryRepository inventoryRepository, TenantIdentifierResolver tenantIdentifierResolver, WarehouseRepository warehouseRepository, ViewProductSummaryRepository viewProductListRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.inventoryRepository = inventoryRepository;
         this.tenantIdentifierResolver = tenantIdentifierResolver;
-        this.productCategoryRepository = productCategoryRepository;
         this.warehouseRepository = warehouseRepository;
         this.viewProductListRepository = viewProductListRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     public Page<ViewProductSummary> getProduct(int page, int size) {
@@ -44,96 +44,106 @@ public class InventoryService extends BaseService{
     }
 
     @Transactional
-    public void createInventory(CreateInventoryDto createInventoryDto, String createdBy, Long existingProductId) throws Exception {
+    public void createInventory(InventoryDto inventoryDto, String createdBy, Long existingProductId) throws Exception {
 
         Product product = null;
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
 
-        if(createInventoryDto.productCategoryIds().size() > 5) {
-            throw new Exception("Too many categories");
-        }
-
         if(existingProductId != null) {
-            Optional<Product> existing = this.productRepository.findById(existingProductId);
+            Optional<Product> existing = this.productRepository.findByTenantAndId(tenantId, existingProductId);
             if(existing.isEmpty()) {
                 throw new Exception("Existing product not found");
             } else {
                 product = existing.get();
             }
         } else {
-            product = this.mapProductFromRequest(createInventoryDto, tenantId, createdBy);
+            product = this.mapProductFromRequest(inventoryDto, tenantId, createdBy);
             product = this.productRepository.save(product);
-            for (Long categoryId : createInventoryDto.productCategoryIds()) {
-                ProductCategoryId productCategoryId = new ProductCategoryId();
-                productCategoryId.setCategoryId(categoryId);
-                productCategoryId.setProductId(product.getId());
-                productCategoryId.setTenantId(tenantId);
-                ProductCategory productCategory = new ProductCategory();
-                productCategory.setId(productCategoryId);
-                productCategory.setCreatedAt(Instant.now());
-                productCategory.setCreatedBy(createdBy);
-                this.productCategoryRepository.save(productCategory);
-            }
         }
 
-        Inventory newInventory = this.mapInventoryFromRequest(createInventoryDto, tenantId, createdBy, product);
+        Inventory newInventory = this.mapInventoryFromRequest(inventoryDto, tenantId, createdBy, product);
+
         this.inventoryRepository.save(newInventory);
     }
 
-    private Product mapProductFromRequest(CreateInventoryDto createInventoryDto, Long tenantId, String createdBy) {
+    private Product mapProductFromRequest(InventoryDto inventoryDto, Long tenantId, String createdBy) {
 
-        Product product = new Product();
+        ProductMapper productMapper = Mappers.getMapper(ProductMapper.class);
+
+        Product product = productMapper.toEntity(inventoryDto.product());
         product.setTenant(tenantId);
         product.setCreatedAt(Instant.now());
         product.setCreatedBy(createdBy);
-        product.setPrice(new BigDecimal(String.valueOf(createInventoryDto.productPrice())));
-        product.setLabel(createInventoryDto.productLabel());
-
-        if(createInventoryDto.productUpi() != null) {
-            product.setUpi(createInventoryDto.productUpi());
-        }
-
-        if(createInventoryDto.productImageUrl() != null) {
-            product.setImageUrl(createInventoryDto.productImageUrl());
-        }
-
-        if(createInventoryDto.productUpi() != null) {
-            product.setUpi(createInventoryDto.productUpi());
-        }
 
         return product;
     }
 
-    private Inventory mapInventoryFromRequest(CreateInventoryDto createInventoryDto, Long tenantId, String createdBy, @NotNull  Product product) throws Exception {
+    private Inventory mapInventoryFromRequest(InventoryDto inventoryDto, Long tenantId, String createdBy, @NotNull  Product product) throws Exception {
 
         Inventory newInventory = new Inventory();
         newInventory.setTenant(tenantId);
         newInventory.setCreatedAt(Instant.now());
         newInventory.setCreatedBy(createdBy);
         newInventory.setProduct(product);
-        newInventory.setSku(createInventoryDto.sku());
-        newInventory.setQuantity(createInventoryDto.quantity());
+        newInventory.setQuantity(inventoryDto.quantity());
 
-        Optional<Warehouse> selectedWarehouse = this.warehouseRepository.findById(createInventoryDto.warehouse());
+        Optional<Warehouse> selectedWarehouse = this.warehouseRepository.findByTenantAndId(tenantId, inventoryDto.warehouse());
 
         if(selectedWarehouse.isPresent()) {
             newInventory.setWarehouse(selectedWarehouse.get());
         } else {
-            throw new Exception("Selected Warehouse is invalid");
+            throw new Exception("Selected Warehouse was invalid");
         }
 
-        if(createInventoryDto.minimumQuantity() != null) {
-            newInventory.setMinimumQuantity(createInventoryDto.minimumQuantity());
+        if(inventoryDto.minimumQuantity() != null) {
+            newInventory.setMinimumQuantity(inventoryDto.minimumQuantity());
         }
 
-        if(createInventoryDto.maximumQuantity() != null) {
-            newInventory.setMaximumQuantity(createInventoryDto.maximumQuantity());
+        if(inventoryDto.maximumQuantity() != null) {
+            newInventory.setMaximumQuantity(inventoryDto.maximumQuantity());
         }
         // TODO BUG - Fix notes not populating in db
-        if(createInventoryDto.notes() != null) {
+        if(inventoryDto.notes() != null) {
             newInventory.setNotes(newInventory.getNotes());
         }
 
         return newInventory;
     }
+
+    @Transactional
+    public void updateInventory(Long productId, InventoryDto inventoryDto, String updatedBy) throws Exception {
+
+        ProductMapper productMapper = Mappers.getMapper(ProductMapper.class);
+        InventoryMapper inventoryMapper = Mappers.getMapper(InventoryMapper.class);
+
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
+
+        Optional<Product> product = this.productRepository.findByTenantAndId(tenantId, productId);
+
+        if(product.isEmpty()) {
+            throw new Exception("Product Entity Not Found.");
+        }
+
+        if(inventoryDto.inventoryId() != null) {
+
+            Optional<Inventory> inventory = this.inventoryRepository.findAByProductAndId(product.get(), inventoryDto.inventoryId());
+
+            if(inventory.isEmpty()) {
+                throw new Exception("Inventory Entity Not Found.");
+            }
+
+            Inventory updatedInventory = inventoryMapper.partialUpdate(inventoryDto, inventory.get());
+            updatedInventory.setUpdatedAt(Instant.now());
+            updatedInventory.setUpdatedBy(updatedBy);
+
+            this.inventoryRepository.save(updatedInventory);
+        }
+
+        Product updatedProduct = productMapper.partialUpdate(inventoryDto.product(), product.get());
+        updatedProduct.setUpdatedAt(Instant.now());
+        updatedProduct.setUpdatedBy(updatedBy);
+
+        this.productRepository.save(updatedProduct);
+    }
+
 }

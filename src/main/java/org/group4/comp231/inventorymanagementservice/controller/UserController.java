@@ -7,9 +7,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
+import org.group4.comp231.inventorymanagementservice.dto.user.UserSummaryInfoDto;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserUpdateDto;
 import org.group4.comp231.inventorymanagementservice.service.KeycloakClientService;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,7 +31,7 @@ public class UserController extends BaseController{
 
     @GetMapping
     @Operation(description = "Get all users by under a company.")
-    public ResponseEntity<List<UserRepresentation>> getAllUserByTenant(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
+    public ResponseEntity<List<UserSummaryInfoDto>> getAllUserByTenant(@AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) {
         return new ResponseEntity<>(this.keycloakClientService.getAllUsersByTenant(Long.parseLong(tenantId)), HttpStatus.OK);
     }
 

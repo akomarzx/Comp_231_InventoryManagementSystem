@@ -5,7 +5,9 @@ import jakarta.ws.rs.core.Response;
 import org.group4.comp231.inventorymanagementservice.config.KeycloakClientConfig;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeValue;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
+import org.group4.comp231.inventorymanagementservice.dto.user.UserSummaryInfoDto;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserUpdateDto;
+import org.group4.comp231.inventorymanagementservice.mapper.user.UserRepresentationMapper;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -15,15 +17,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class KeycloakClientService extends BaseService{
     private final KeycloakClientConfig clientConfig;
     private final StaticCodeService staticCodeService;
+    private final UserRepresentationMapper userRepresentationMapper;
 
-    public KeycloakClientService(KeycloakClientConfig config, StaticCodeService staticCodeService) {
+    public KeycloakClientService(KeycloakClientConfig config, StaticCodeService staticCodeService, UserRepresentationMapper userRepresentationMapper) {
         this.clientConfig = config;
         this.staticCodeService = staticCodeService;
+        this.userRepresentationMapper = userRepresentationMapper;
     }
 
     public void registerNewUser(UserRegistrationDto dto, Long tenantId, boolean isNewCustomerRegistration) {
@@ -41,7 +46,7 @@ public class KeycloakClientService extends BaseService{
         }
     }
 
-    public List<UserRepresentation> getAllUsersByTenant(@NotNull Long tenantId) {
+    public List<UserSummaryInfoDto> getAllUsersByTenant(@NotNull Long tenantId) {
 
         UsersResource usersResource = this.clientConfig.usersResource();
         List<UserRepresentation> allUserByTenant = usersResource.searchByAttributes(0, 10, true, true, "tenant_id:" + tenantId);
@@ -51,7 +56,7 @@ public class KeycloakClientService extends BaseService{
             user.setGroups(groups.stream().map(GroupRepresentation::getName).toList());
         }
 
-        return allUserByTenant;
+        return allUserByTenant.stream().map(this.userRepresentationMapper::toDto).collect(Collectors.toList());
     }
 
     public void updateUser(@NotNull String userId, @NotNull UserUpdateDto userUpdateDto, Long tenantId) {

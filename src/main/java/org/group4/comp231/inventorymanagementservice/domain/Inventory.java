@@ -35,11 +35,6 @@ public class Inventory {
     @TenantId
     private Long tenant;
 
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "sku", nullable = false)
-    private String sku;
-
     @NotNull
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -98,14 +93,6 @@ public class Inventory {
 
     public void setTenant(Long tenant) {
         this.tenant = tenant;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
     }
 
     public Warehouse getWarehouse() {

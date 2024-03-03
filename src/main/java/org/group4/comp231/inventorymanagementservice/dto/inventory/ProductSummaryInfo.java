@@ -1,5 +1,7 @@
 package org.group4.comp231.inventorymanagementservice.dto.inventory;
 
+import org.group4.comp231.inventorymanagementservice.domain.Category;
+
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -20,8 +22,9 @@ public interface ProductSummaryInfo {
 
     Set<CategoryInfo> getProductCategories();
 
+    String getSku();
     /**
-     * Projection for {@link org.group4.comp231.inventorymanagementservice.domain.category.Category}
+     * Projection for {@link Category}
      */
     interface CategoryInfo {
         Long getId();

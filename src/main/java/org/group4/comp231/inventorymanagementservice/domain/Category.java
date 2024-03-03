@@ -1,4 +1,4 @@
-package org.group4.comp231.inventorymanagementservice.domain.category;
+package org.group4.comp231.inventorymanagementservice.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

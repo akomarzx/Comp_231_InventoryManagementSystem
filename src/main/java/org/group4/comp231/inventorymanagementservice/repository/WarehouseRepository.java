@@ -9,6 +9,5 @@ import java.util.Optional;
 
 public interface WarehouseRepository extends JpaRepository<Warehouse, Long> {
     List<WarehouseInfo> findAllBy();
-
     Optional<Warehouse> findByTenantAndId(Long tenantId, Long id);
 }

@@ -33,7 +33,12 @@ public class TenantController extends BaseController{
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TenantDto> getTenant(@NotNull @PathVariable("id") Long id) throws Exception {
+    public ResponseEntity<TenantDto> getTenant(@NotNull @PathVariable("id") Long id,
+                                               @AuthenticationPrincipal(expression = "claims['tenant_id']") String tenantId) throws Exception {
+
+        if(validateIfTenantIDMatched(id, tenantId)) {
+            throw new Exception("Invalid Tenant Id");
+        }
 
         TenantDto dto = this.tenantService.getTenant(id);
 
