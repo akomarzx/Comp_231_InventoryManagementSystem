@@ -1,32 +1,20 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Account;
-import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
 import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
-import org.group4.comp231.inventorymanagementservice.dto.account.CreateAccountDto;
-import org.group4.comp231.inventorymanagementservice.dto.account.UpdateAccountDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
+import org.group4.comp231.inventorymanagementservice.dto.account.AccountSummaryInfo;
 import org.group4.comp231.inventorymanagementservice.mapper.account.AccountMapper;
-import org.group4.comp231.inventorymanagementservice.mapper.warehouse.WarehouseMapper;
 import org.group4.comp231.inventorymanagementservice.repository.AccountRepository;
-import org.group4.comp231.inventorymanagementservice.repository.WarehouseRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-public class AccountService {
-    private static final Log log = LogFactory.getLog(AccountService.class);
+public class AccountService extends BaseService {
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final TenantIdentifierResolver tenantIdentifierResolver;
@@ -38,14 +26,12 @@ public class AccountService {
     }
 
     @Transactional
-    public List<AccountDto> getAllAccount(@NotNull Long tenantId) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        List<Account> warehouses = this.accountRepository.findAll();
-        return warehouses.stream().map(accountMapper::toDto).collect(Collectors.toList());
+    public List<AccountSummaryInfo> getAllAccount() {
+        return this.accountRepository.findAllBy();
     }
 
-    public void createAccount(CreateAccountDto dto, Long tenantId, String createdBy) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
+    public void createAccount(AccountDto dto, String createdBy) {
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         Account newAccount = this.accountMapper.partialUpdate(dto, new Account());
         newAccount.getAddress().setTenant(tenantId);
         newAccount.getAddress().setCreatedAt(Instant.now());
@@ -57,10 +43,11 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountDto updateAccount(Long categoryId, UpdateAccountDto dto, Long tenantId, String updatedBy) {
+    public void updateAccount(Long categoryId, AccountDto dto, String updatedBy) throws Exception {
 
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        Optional<Account> account = this.accountRepository.findById(categoryId);
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
+
+        Optional<Account> account = this.accountRepository.findByTenantAndId(tenantId, categoryId);
 
         if (account.isPresent()) {
 
@@ -71,15 +58,20 @@ public class AccountService {
             entity.setUpdatedAt(Instant.now());
 
             this.accountRepository.save(entity);
-
-            return this.accountMapper.toDto(entity);
-
         } else {
-            return null;
+            throw new Exception("Entity not found");
         }
     }
 
     public void deleteAccount(Long id) {
+
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
+
+        Optional<Account> toBeDeleted = this.accountRepository.findByTenantAndId(tenantId, id);
+        if (toBeDeleted.isEmpty()) {
+            return;
+        }
+
         this.accountRepository.deleteById(id);
     }
 }

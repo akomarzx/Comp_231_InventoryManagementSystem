@@ -1,4 +1,4 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeBook;
 import org.group4.comp231.inventorymanagementservice.repository.CodeBookRepository;
@@ -9,11 +9,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class StaticCodeService {
+public class StaticCodeService extends BaseService {
 
     private final CodeBookRepository codeBookRepository;
     private List<CodeBook> codeBook;
-
     public final Long CODEBOOK_COUNTRY_ID = 10000L;
     public final Long CODEBOOK_PROVINCE_ID = 20000L;
     public final Long ACCOUNT_TYPE_ID = 60000L;
@@ -25,7 +24,7 @@ public class StaticCodeService {
     }
 
     public List<CodeBook> getAllStaticCode() {
-        if (codeBook == null) {
+        if(codeBook == null) {
             this.codeBook = this.codeBookRepository.findAll();
         }
 

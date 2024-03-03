@@ -1,14 +1,10 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Warehouse;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.CreateWarehouseDto;
-import org.group4.comp231.inventorymanagementservice.dto.warehouse.UpdateWarehouseDto;
 import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseDto;
+import org.group4.comp231.inventorymanagementservice.dto.warehouse.WarehouseInfo;
 import org.group4.comp231.inventorymanagementservice.mapper.warehouse.WarehouseMapper;
 import org.group4.comp231.inventorymanagementservice.repository.WarehouseRepository;
 import org.springframework.stereotype.Service;
@@ -16,12 +12,9 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-public class WarehouseService {
-    private static final Log log = LogFactory.getLog(WarehouseService.class);
-
+public class WarehouseService extends BaseService {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
     private final TenantIdentifierResolver tenantIdentifierResolver;
@@ -33,14 +26,12 @@ public class WarehouseService {
     }
 
     @Transactional
-    public List<WarehouseDto> getWarehouse(@NotNull Long tenantId) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        List<Warehouse> warehouses = this.warehouseRepository.findAll();
-        return warehouses.stream().map(warehouseMapper::toDto).collect(Collectors.toList());
+    public List<WarehouseInfo> getWarehouse() {
+        return this.warehouseRepository.findAllBy();
     }
 
-    public void createWarehouse(CreateWarehouseDto dto, Long tenantId, String createdBy) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
+    public void createWarehouse(WarehouseDto dto, String createdBy) {
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         Warehouse newWarehouse = this.warehouseMapper.partialUpdate(dto, new Warehouse());
         newWarehouse.getAddress().setTenant(tenantId);
         newWarehouse.getAddress().setCreatedAt(Instant.now());
@@ -52,10 +43,11 @@ public class WarehouseService {
     }
 
     @Transactional
-    public WarehouseDto updateWarehouse(Long categoryId, UpdateWarehouseDto dto, Long tenantId, String updatedBy) {
+    public void updateWarehouse(Long categoryId, WarehouseDto dto, String updatedBy) throws Exception {
 
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        Optional<Warehouse> category = this.warehouseRepository.findById(categoryId);
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
+
+        Optional<Warehouse> category = this.warehouseRepository.findByTenantAndId(tenantId, categoryId);
 
         if(category.isPresent()) {
 
@@ -67,10 +59,13 @@ public class WarehouseService {
 
             this.warehouseRepository.save(entity);
 
-            return this.warehouseMapper.toDto(entity);
-
         } else {
-            return null;
+            throw new Exception("Entity not found");
         }
+    }
+
+    @Transactional
+    public void deleteWarehouse(Long id) {
+        this.warehouseRepository.deleteById(id);
     }
 }

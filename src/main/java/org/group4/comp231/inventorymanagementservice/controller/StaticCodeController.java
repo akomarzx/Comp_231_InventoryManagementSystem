@@ -3,7 +3,7 @@ package org.group4.comp231.inventorymanagementservice.controller;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeBook;
-import org.group4.comp231.inventorymanagementservice.services.StaticCodeService;
+import org.group4.comp231.inventorymanagementservice.service.StaticCodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/code")
 @SecurityRequirement(name = "Keycloak")
 @Tag(name = "Static Code", description = "Static Codes API")
-public class StaticCodeController {
+public class StaticCodeController extends BaseController{
 
     private final StaticCodeService staticCodeService;
 

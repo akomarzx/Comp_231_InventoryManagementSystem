@@ -138,26 +138,6 @@ create table  if not exists tenant (
     updated_by varchar(255)
 ) ENGINE=INNODB;
 
-create table if not exists `product` (
-    product_id bigint auto_increment primary key,
-    tenant_id bigint not null,
-    upi bigint unique,
-    price decimal,
-    label varchar(255) not null,
-    image_url varchar(255),
-    created_at timestamp not null default current_timestamp(),
-    created_by varchar(255) not null,
-    updated_at timestamp,
-    updated_by varchar(255),
-    foreign key(tenant_id)
-        references tenant (tenant_id)
-        on update restrict
-        on delete cascade
-) ENGINE=INNODB;
-
-create index product_upi_idx on product (upi);
-create index product_tenant_id_idx on product (tenant_id);
-
 create table if not exists `category` (
     category_id bigint auto_increment primary key,
     tenant_id bigint not null,
@@ -175,32 +155,32 @@ create table if not exists `category` (
 
 create index category_tenant_id_idx on category (tenant_id);
 
-create table if not exists `product_category` (
-    product_id bigint,
-    category_id bigint,
-    tenant_id bigint not null ,
+create table if not exists `product` (
+    product_id bigint auto_increment primary key,
+    tenant_id bigint not null,
+    upi bigint unique,
+    price decimal,
+    label varchar(255) not null,
+    image_url varchar(255),
     created_at timestamp not null default current_timestamp(),
     created_by varchar(255) not null,
     updated_at timestamp,
     updated_by varchar(255),
-    primary key(product_id, category_id, tenant_id),
-    foreign key(product_id)
-        references product (product_id)
-        on update restrict 
-        on delete cascade,
-    foreign key(category_id)
-        references category (category_id)
-        on update restrict 
-        on delete cascade,
+    category_id bigint not null,
+    sku varchar(255) not null unique,
     foreign key(tenant_id)
         references tenant (tenant_id)
         on update restrict
+        on delete cascade,
+    foreign key(category_id)
+        references category (category_id)
+        on update restrict
         on delete cascade
-);
+) ENGINE=INNODB;
 
-create index product_category_product_id_idx on product_category (product_id);
-create index product_category_category_id_idx on product_category (category_id);
-create index product_category_tenant_id_idx on product_category (tenant_id);
+create index product_upi_idx on product (upi);
+create index product_tenant_id_idx on product (tenant_id);
+create index product_category_id_idx on product (category_id);
 
 create table if not exists `address` (
     address_id bigint primary key  auto_increment,
@@ -265,6 +245,7 @@ create table if not exists  `account` (
       created_by varchar(255) not null,
       updated_at timestamp,
       updated_by varchar(255),
+      email varchar(255) not null,
       foreign key (account_type)
           references code_value (code_value_id)
           on update restrict
@@ -322,11 +303,10 @@ create table if not exists inventory (
     inventory_id bigint primary key auto_increment,
     product_id bigint not null,
     tenant_id bigint not null,
-    sku varchar(255) not null unique,
     warehouse_id bigint not null,
     quantity bigint default 0 not null,
-    minimum_quantity bigint not null,
-    maximum_quantity bigint not null,
+    minimum_quantity bigint,
+    maximum_quantity bigint,
     created_at timestamp not null default current_timestamp(),
     created_by varchar(255) not null,
     updated_at timestamp,

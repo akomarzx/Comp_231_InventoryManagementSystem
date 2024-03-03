@@ -1,16 +1,12 @@
 package org.group4.comp231.inventorymanagementservice.domain;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.TenantId;
+import org.hibernate.annotations.*;
 
 import java.time.Instant;
 

@@ -1,13 +1,13 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.core.Response;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.config.KeycloakClientConfig;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeValue;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserRegistrationDto;
+import org.group4.comp231.inventorymanagementservice.dto.user.UserSummaryInfoDto;
 import org.group4.comp231.inventorymanagementservice.dto.user.UserUpdateDto;
+import org.group4.comp231.inventorymanagementservice.mapper.user.UserRepresentationMapper;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -17,18 +17,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class KeycloakClientService {
-
-    private static final Log log = LogFactory.getLog(KeycloakClientService.class);
-
+public class KeycloakClientService extends BaseService{
     private final KeycloakClientConfig clientConfig;
     private final StaticCodeService staticCodeService;
+    private final UserRepresentationMapper userRepresentationMapper;
 
-    public KeycloakClientService(KeycloakClientConfig config, StaticCodeService staticCodeService) {
+    public KeycloakClientService(KeycloakClientConfig config, StaticCodeService staticCodeService, UserRepresentationMapper userRepresentationMapper) {
         this.clientConfig = config;
         this.staticCodeService = staticCodeService;
+        this.userRepresentationMapper = userRepresentationMapper;
     }
 
     public void registerNewUser(UserRegistrationDto dto, Long tenantId, boolean isNewCustomerRegistration) {
@@ -38,7 +38,7 @@ public class KeycloakClientService {
 
         try(Response response = usersResource.create(userRepresentation)) {
             log.info("Creating new User: " + response.getStatus());
-            if (response.getStatus() != HttpStatus.CREATED.value()) {
+            if(response.getStatus() != HttpStatus.CREATED.value()) {
                 throw new Exception("Failed to register new user." + "IAM StatusCode: " + response.getStatus());
             }
         } catch (Exception e) {
@@ -46,7 +46,7 @@ public class KeycloakClientService {
         }
     }
 
-    public List<UserRepresentation> getAllUsersByTenant(@NotNull Long tenantId) {
+    public List<UserSummaryInfoDto> getAllUsersByTenant(@NotNull Long tenantId) {
 
         UsersResource usersResource = this.clientConfig.usersResource();
         List<UserRepresentation> allUserByTenant = usersResource.searchByAttributes(0, 10, true, true, "tenant_id:" + tenantId);
@@ -56,18 +56,20 @@ public class KeycloakClientService {
             user.setGroups(groups.stream().map(GroupRepresentation::getName).toList());
         }
 
-        return allUserByTenant;
+        return allUserByTenant.stream().map(this.userRepresentationMapper::toDto).collect(Collectors.toList());
     }
 
     public void updateUser(@NotNull String userId, @NotNull UserUpdateDto userUpdateDto, Long tenantId) {
+
         UsersResource usersResource = this.clientConfig.usersResource();
 
         UserRepresentation updateRepresentation = new UserRepresentation();
 
-        if (userUpdateDto.getFirstName() != null) {
+        if(userUpdateDto.getFirstName() != null) {
             updateRepresentation.setFirstName(userUpdateDto.getFirstName());
         }
-        if (userUpdateDto.getLastName() != null) {
+
+        if(userUpdateDto.getLastName() != null) {
             updateRepresentation.setLastName(userUpdateDto.getLastName());
         }
 
@@ -97,15 +99,17 @@ public class KeycloakClientService {
 
         keycloakUserRepresentationDto.setUsername(dto.getUsername());
         keycloakUserRepresentationDto.setEmail(dto.getEmail());
+        keycloakUserRepresentationDto.setEmailVerified(true);
         keycloakUserRepresentationDto.setEnabled(true);
         keycloakUserRepresentationDto.setFirstName(dto.getFirstName());
         keycloakUserRepresentationDto.setLastName(dto.getLastName());
         keycloakUserRepresentationDto.setCredentials(List.of(credentialRepresentation));
 
-        if (newCustomerRegistration) {
+        if(newCustomerRegistration) {
             keycloakUserRepresentationDto.setGroups(List.of("administrator_group"));
         } else {
             keycloakUserRepresentationDto.setGroups(getGroupNameByCode(dto.getGroupCodes()));
+            keycloakUserRepresentationDto.setRequiredActions(List.of("UPDATE_PASSWORD"));
         }
 
         keycloakUserRepresentationDto.setAttributes(Map.of("tenant_id", Collections.singletonList(tenantId.toString())));
@@ -114,6 +118,7 @@ public class KeycloakClientService {
     }
 
     private void updateUserGroups(List<String> groupNames, UserResource userResource) {
+
         List<GroupRepresentation> existingGroupsInRealm = this.clientConfig.realmRepresentation().groups().groups();
         List<GroupRepresentation> usersExistingGroups = userResource.groups();
 

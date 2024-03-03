@@ -4,11 +4,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDto;
-import org.group4.comp231.inventorymanagementservice.services.TenantService;
+import org.group4.comp231.inventorymanagementservice.service.TenantService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,8 +19,7 @@ import java.util.Objects;
 @SecurityRequirement(name = "Keycloak")
 @RequestMapping("/tenant")
 @Tag(name = "Tenant", description = "Endpoints for Tenant Management")
-public class TenantController {
-    private static final Log log = LogFactory.getLog(TenantController.class);
+public class TenantController extends BaseController{
     private final TenantService tenantService;
 
     public TenantController(TenantService tenantService) {

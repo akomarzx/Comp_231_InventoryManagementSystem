@@ -1,11 +1,9 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
-import jakarta.validation.constraints.NotNull;
-import org.group4.comp231.inventorymanagementservice.dto.category.UpdateCategoryDto;
+import org.group4.comp231.inventorymanagementservice.dto.category.CategorySummary;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
-import org.group4.comp231.inventorymanagementservice.domain.category.Category;
+import org.group4.comp231.inventorymanagementservice.domain.Category;
 import org.group4.comp231.inventorymanagementservice.dto.category.CategoryDto;
-import org.group4.comp231.inventorymanagementservice.dto.category.CreateCategoryDto;
 import org.group4.comp231.inventorymanagementservice.mapper.category.CategoryMapper;
 import org.group4.comp231.inventorymanagementservice.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
@@ -15,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CategoryService {
+public class CategoryService extends BaseService {
 
     private final CategoryRepository categoryRepository;
     private final TenantIdentifierResolver tenantIdentifierResolver;
@@ -28,12 +26,12 @@ public class CategoryService {
         this.categoryMapper = categoryMapper;
     }
 
-    public List<CategoryDto> getCategories(@NotNull Long tenantId) {
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        return this.categoryRepository.findBy();
+    public List<CategorySummary> getCategories() {
+        return this.categoryRepository.findAllBy();
     }
 
-    public void createCategory(CreateCategoryDto createUpdateCategoryDto, Long tenantId, String createdBy) {
+    public void createCategory(CategoryDto createUpdateCategoryDto, String createdBy) {
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
         Category newCategory = this.categoryMapper.partialUpdate(createUpdateCategoryDto, new Category());
         newCategory.setTenant(tenantId);
@@ -42,10 +40,10 @@ public class CategoryService {
         this.categoryRepository.save(newCategory);
     }
 
-    public CategoryDto updateCategory(Long categoryId, UpdateCategoryDto dto, Long tenantId, String updatedBy) {
+    public void updateCategory(Long categoryId, CategoryDto dto, String updatedBy) throws Exception {
 
-        this.tenantIdentifierResolver.setCurrentTenant(tenantId);
-        Optional<Category> category = this.categoryRepository.findById(categoryId);
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
+        Optional<Category> category = this.categoryRepository.findByTenantAndId(tenantId, categoryId);
 
         if(category.isPresent()) {
 
@@ -54,10 +52,21 @@ public class CategoryService {
             entity.setUpdatedAt(Instant.now());
 
             this.categoryRepository.save(entity);
-            return this.categoryMapper.toCategoryDto(entity);
-
         } else {
-            return null;
+            throw new Exception("Entity Not Found");
         }
     }
+
+    public void deleteCategory(Long categoryId) {
+
+        Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
+        Optional<Category> toBeDeleted = this.categoryRepository.findByTenantAndId(tenantId, categoryId);
+
+        if(toBeDeleted.isEmpty()) {
+            return;
+        }
+
+        this.categoryRepository.deleteById(categoryId);
+    }
+
 }

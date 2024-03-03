@@ -1,6 +1,7 @@
-package org.group4.comp231.inventorymanagementservice.services;
+package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
+import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
 import org.group4.comp231.inventorymanagementservice.domain.Tenant;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.CreateUpdateTenantDTO;
 import org.group4.comp231.inventorymanagementservice.dto.tenant.TenantDto;
@@ -16,11 +17,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TenantService {
+public class TenantService extends BaseService {
 
     private final TenantRepository tenantRepository;
     private final TenantMapper tenantMapper;
-    
     private final KeycloakClientService keycloakClientService;
 
     public TenantService(TenantRepository tenantRepository, TenantMapper tenantMapper, KeycloakClientService keycloakClientService) {
@@ -49,7 +49,7 @@ public class TenantService {
     }
 
     @Transactional(rollbackOn = {WebClientResponseException.class, Exception.class})
-    public void createTenant(UserRegistrationDto dto) throws Exception {
+    public void createTenant(UserRegistrationDto dto) {
 
         Tenant newTenant = new Tenant();
 
