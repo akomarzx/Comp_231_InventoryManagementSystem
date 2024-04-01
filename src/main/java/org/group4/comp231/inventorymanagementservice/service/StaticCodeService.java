@@ -12,11 +12,16 @@ import java.util.Optional;
 public class StaticCodeService extends BaseService {
 
     private final CodeBookRepository codeBookRepository;
+
     private List<CodeBook> codeBook;
+
     public final Long CODEBOOK_COUNTRY_ID = 10000L;
     public final Long CODEBOOK_PROVINCE_ID = 20000L;
     public final Long ACCOUNT_TYPE_ID = 60000L;
     public final Long CODEBOOK_GROUP_ID = 70000L;
+
+    public final Long VENDOR_ACCOUNT_CODE_VALUE_ID = 600010L;
+    public final Long SELLER_ACCOUNT_CODE_VALUE_ID = 600020L;
 
     public StaticCodeService(CodeBookRepository codeBookRepository) {
         this.codeBookRepository = codeBookRepository;
@@ -31,7 +36,7 @@ public class StaticCodeService extends BaseService {
         return this.codeBook;
     }
 
-    public Optional<CodeBook> getGCodeValueListUsingCodeBookID(Long codebookID) {
+    public Optional<CodeBook> getCodeValueListUsingCodeBookID(Long codebookID) {
         if(codeBook != null) {
             return this.codeBook.stream().filter(codeBook1 -> Objects.equals(codeBook1.getId(), codebookID)).findFirst();
         }

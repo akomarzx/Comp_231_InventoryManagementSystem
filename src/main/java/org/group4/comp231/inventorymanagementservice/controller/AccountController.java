@@ -32,8 +32,8 @@ public class AccountController extends BaseController {
 
     @GetMapping
     @Operation(description = "Get All Accounts")
-    public ResponseEntity<List<AccountSummaryInfo>> getAllAccount() {
-        return new ResponseEntity<>(this.accountService.getAllAccount(), HttpStatus.OK);
+    public ResponseEntity<List<AccountSummaryInfo>> getAllAccount(@RequestParam(required = false) String type) {
+        return new ResponseEntity<>(this.accountService.getAllAccount(type), HttpStatus.OK);
     }
 
     @PostMapping

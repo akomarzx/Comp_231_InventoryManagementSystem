@@ -28,7 +28,7 @@ public class CodeValueValidator implements ConstraintValidator<ValidateCodeID, L
 
     @Override
     public boolean isValid(Long id, ConstraintValidatorContext constraintValidatorContext) {
-        Optional<CodeBook> codeValueList = this.staticCodeService.getGCodeValueListUsingCodeBookID(codeBookID);
+        Optional<CodeBook> codeValueList = this.staticCodeService.getCodeValueListUsingCodeBookID(codeBookID);
         if (id == null) {
             return true;
         }

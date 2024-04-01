@@ -12,4 +12,6 @@ public interface AccountRepository extends JpaRepository<Account, Long>, JpaSpec
     List<AccountSummaryInfo> findAllBy();
 
     Optional<Account> findByTenantAndId(Long tenantId, Long id);
+
+    List<AccountSummaryInfo> findByAccountType(Long accountType);
 }
