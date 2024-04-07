@@ -3,8 +3,7 @@ package org.group4.comp231.inventorymanagementservice.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 
@@ -26,10 +25,6 @@ public class OrderItem {
     private Long order;
 
     @NotNull
-    @Column(name = "product_id", nullable = false)
-    private Long product;
-
-    @NotNull
     @Column(name = "tenant_id", nullable = false)
     private Long tenant;
 
@@ -37,17 +32,9 @@ public class OrderItem {
     @Column(name = "inventory_id", nullable = false)
     private Long inventory;
 
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "sku", nullable = false)
-    private String sku;
-
     @NotNull
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
-
-    @Column(name = "quantity_recevied")
-    private Integer quantityRecevied;
 
     @NotNull
     @Column(name = "created_at", nullable = false)
@@ -69,6 +56,18 @@ public class OrderItem {
     @Column(name = "notes")
     private String notes;
 
+    @ColumnDefault("0")
+    @Column(name = "quantity_processed")
+    private Integer quantityProcessed;
+
+    public Integer getQuantityProcessed() {
+        return quantityProcessed;
+    }
+
+    public void setQuantityProcessed(Integer quantityProcessed) {
+        this.quantityProcessed = quantityProcessed;
+    }
+
     public Long getId() {
         return id;
     }
@@ -83,14 +82,6 @@ public class OrderItem {
 
     public void setOrder(Long order) {
         this.order = order;
-    }
-
-    public Long getProduct() {
-        return product;
-    }
-
-    public void setProduct(Long product) {
-        this.product = product;
     }
 
     public Long getTenant() {
@@ -109,28 +100,12 @@ public class OrderItem {
         this.inventory = inventory;
     }
 
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
     public Integer getQuantity() {
         return quantity;
     }
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-    }
-
-    public Integer getQuantityRecevied() {
-        return quantityRecevied;
-    }
-
-    public void setQuantityRecevied(Integer quantityRecevied) {
-        this.quantityRecevied = quantityRecevied;
     }
 
     public Instant getCreatedAt() {

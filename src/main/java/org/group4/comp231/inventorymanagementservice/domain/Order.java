@@ -3,8 +3,6 @@ package org.group4.comp231.inventorymanagementservice.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;

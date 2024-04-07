@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @Service
 public class AccountService extends BaseService {
+
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final TenantIdentifierResolver tenantIdentifierResolver;
