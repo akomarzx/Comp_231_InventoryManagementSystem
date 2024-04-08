@@ -44,6 +44,10 @@ public class CodeValueValidator implements ConstraintValidator<ValidateCodeID, L
             return this.staticCodeService.CODEBOOK_ACCOUNT_TYPE_ID;
         } else if (parameter.equalsIgnoreCase("ORDERTYPE")) {
             return this.staticCodeService.CODEBOOK_ORDER_TYPE_ID;
+        } else if (parameter.equalsIgnoreCase("SALESORDERSTATUS")) {
+            return this.staticCodeService.CODEBOOK_SALES_ORDER_STATUS_ID;
+        } else if (parameter.equalsIgnoreCase("PURCHASEORDERSTATUS")) {
+            return this.staticCodeService.CODEBOOK_PURCHASE_ORDER_STATUS_ID;
         } else {
             return null;
         }

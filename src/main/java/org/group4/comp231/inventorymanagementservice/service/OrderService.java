@@ -8,17 +8,18 @@ import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeBook
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeValue;
 import org.group4.comp231.inventorymanagementservice.dto.order.OrderDto;
 import org.group4.comp231.inventorymanagementservice.dto.order.OrderItemDTO;
+import org.group4.comp231.inventorymanagementservice.dto.order.ProcessSalesOrderDTO;
 import org.group4.comp231.inventorymanagementservice.mapper.order.OrderMapper;
 import org.group4.comp231.inventorymanagementservice.repository.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+// TODO: Packing List, Invoice,
 
 @Service
 public class OrderService extends BaseService {
@@ -95,7 +96,66 @@ public class OrderService extends BaseService {
     }
 
     @Transactional
-    public void updateSalesOrder() {
+    public void updateSalesOrder(Long orderId, ProcessSalesOrderDTO salesOrderDTO, String updatedBy) throws Exception {
+
+        OrderStatus nextUpdateStatus = resolveOrderStatus(salesOrderDTO.processCodeValueId());
+        Optional<Order> currentOrder = this.orderRepository.findById(orderId);
+        List<OrderStatusChange> orderStatusChanges = this.getOrderStatusChanges(orderId);
+
+        if (currentOrder.isEmpty()) {
+            throw new Exception("Order not found - ID: " + orderId);
+        }
+
+        if (currentOrder.get().getOrderStatus().equals(OrderStatus.SALES_ORDER_CLOSED)) {
+            throw new Exception("Order Closed/Completed - ID: " + orderId);
+        }
+
+        switch(nextUpdateStatus) {
+            // Invoicing can be created even after packing or creating packing list.
+            case SALES_ORDER_INVOICED -> {
+                if (!checkIfOrderStatusChangeExist(OrderStatus.SALES_ORDER_INVOICED, orderStatusChanges)) {
+                    createOrderStatusChange(updatedBy, OrderStatus.SALES_ORDER_INVOICED, orderId);
+                }
+            }
+            // Orders can not be marked as paid if invoice was not generated yet
+            case SALES_ORDER_PAID -> {
+                if (checkIfOrderStatusChangeExist(OrderStatus.SALES_ORDER_INVOICED, orderStatusChanges)) {
+                    createOrderStatusChange(updatedBy, OrderStatus.SALES_ORDER_PAID, orderId);
+                } else {
+                    throw new Exception("Invoice was not generated yet.");
+                }
+            }
+            // If Stage Order Packed was passed need to have a valid listItem to update
+            case SALES_ORDER_PACKED -> {
+                if (salesOrderDTO.orderItems() == null || salesOrderDTO.orderItems().isEmpty()) {
+                    throw new Exception("Order Items cannot be null or empty when creating packing list");
+                }
+
+                for (OrderItemDTO orderItemDTO : salesOrderDTO.orderItems()) {
+                    OrderItem orderItem = currentOrder.get().getOrderItems()
+                            .stream()
+                            .filter(oi -> oi.getId().equals(orderItemDTO.id()))
+                            .findFirst().orElseThrow();
+
+                    if (orderItem.getQuantityProcessed() + orderItemDTO.quantity() > orderItem.getQuantity()) {
+                        throw new Exception("Quantity exceeds available Quantity to be processed");
+                    }
+
+                    orderItem.setQuantityProcessed(orderItem.getQuantityProcessed() + orderItemDTO.quantity());
+                    orderItem.setUpdatedAt(Instant.now());
+                    orderItem.setUpdatedBy(updatedBy);
+                    this.orderItemRepository.save(orderItem);
+                }
+
+                if (!checkIfOrderStatusChangeExist(OrderStatus.SALES_ORDER_PACKED, orderStatusChanges)) {
+                    createOrderStatusChange(updatedBy, OrderStatus.SALES_ORDER_PACKED, orderId);
+                } else {
+                    //TODO : Update existing order status Change
+                }
+            }
+
+            case SALES_ORDER_SHIPPED ->
+        }
 
     }
 
@@ -120,6 +180,14 @@ public class OrderService extends BaseService {
         }
     }
 
+    /**
+     * Get Next Stage for the Order
+     * @param orderType Specify type of order, Purchase Or Sales. Pass in the ID from the static code for the correct order type
+     * @param currentStage - Stage of the order that is being process
+     * @return OrderStatus Next Stage for the current Order
+     * @throws Exception - Throw Exception if invalid codebook id, invalid current stage
+     * @deprecated
+     */
     private OrderStatus getNextStage(Long orderType, Long currentStage) throws Exception {
 
         Long codeBookId = orderType.equals(this.staticCodeService.SALES_ORDER_CODE_VALUE_ID)
@@ -146,11 +214,60 @@ public class OrderService extends BaseService {
             if (index >= valList.size() - 1) {
                 throw new Exception("Order cannot be move to the next stage as this order was complete.");
             } else {
-                return Stream.of(OrderStatus.values())
-                        .filter(c -> c.getCode().equals(valList.get(index + 1).getId()))
-                        .findFirst()
-                        .orElseThrow(IllegalArgumentException::new);
+                return resolveOrderStatus(valList.get(index + 1).getId());
             }
         }
+    }
+
+    /**
+     * Resolve Order Status Using ID
+     * @param orderTypeId
+     * @return OrderStatus that corresponds with the Code Value ID
+     * @throws Exception Throws an exception when Code Value ID supplied was not found
+     */
+    private OrderStatus resolveOrderStatus(Long orderTypeId) throws Exception {
+        return Stream.of(OrderStatus.values())
+                .filter(c -> c.getCode().equals(orderTypeId))
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+    }
+
+    /**
+     * Get all past process for the order will be used to decide the correct next step for every order
+     * @param orderId ID for the order the is being processed
+     * @return List of Status Change for this order
+     */
+    List<OrderStatusChange> getOrderStatusChanges(Long orderId) {
+        return orderStatusChangeRepository.findByOrder(orderId);
+    }
+
+    /**
+     * Check if order status change history exist for the current order.
+     * @param status Order Status To check
+     * @return Boolean indication order had been processed to this stage.
+     */
+    private Boolean checkIfOrderStatusChangeExist(OrderStatus status, List<OrderStatusChange> orderStatusChanges) {
+        return orderStatusChanges.stream()
+                .anyMatch(orderStatusChange -> orderStatusChange.getOrderStatus().equals(status));
+    }
+
+    /**
+     *
+     * @param status Status To check
+     * @param orderStatusChanges History of status changes for the order
+     * @return Boolean to indicate if there are stage higher or same than this already exist
+     */
+    private Boolean checkIfThereAreLaterStagesOrStageAlreadyExist(OrderStatus status, List<OrderStatusChange> orderStatusChanges) {
+        return orderStatusChanges.stream()
+                .anyMatch(orderStatusChange -> orderStatusChange.getOrderStatus().getCode() >= status.getCode());
+    }
+
+    private void createOrderStatusChange(String createdBy, OrderStatus orderStatus, Long orderId) {
+        OrderStatusChange orderStatusChange = new OrderStatusChange();
+        orderStatusChange.setCreatedBy(createdBy);
+        orderStatusChange.setOrderStatus(OrderStatus.SALES_ORDER_INVOICED);
+        orderStatusChange.setCreatedAt(Instant.now());
+        orderStatusChange.setOrder(orderId);
+        this.orderStatusChangeRepository.save(orderStatusChange);
     }
 }

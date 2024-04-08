@@ -67,7 +67,7 @@ public class OrderController extends BaseController {
 
     @PutMapping("sales/{id}")
     @Operation(description = "Update Sales/Purchase Order")
-    public ResponseEntity<ObjectUtils.Null> updateSalesOrder(@Valid @RequestBody AccountDto dto,
+    public ResponseEntity<ObjectUtils.Null> updateSalesOrder(
                                                         @NotNull @PathVariable("id") Long id,
                                                         @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
 
