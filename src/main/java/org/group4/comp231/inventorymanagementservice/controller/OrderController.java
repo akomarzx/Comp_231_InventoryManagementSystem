@@ -55,13 +55,23 @@ public class OrderController extends BaseController {
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    @Operation(description = "Update Sales/Purchase Order")
-    public ResponseEntity<ObjectUtils.Null> updateOrder(@Valid @RequestBody AccountDto dto,
-                                                          @NotNull @PathVariable("id") Long id,
-                                                          @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
+//    @PutMapping("purchase/{id}")
+//    @Operation(description = "Update Sales/Purchase Order")
+//    public ResponseEntity<ObjectUtils.Null> updatePurchaseOrder(@Valid @RequestBody AccountDto dto,
+//                                                          @NotNull @PathVariable("id") Long id,
+//                                                          @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
+//
+//        this.orderService.updateOrder();
+//        return ResponseEntity.noContent().build();
+//    }
 
-        this.orderService.updateOrder();
+    @PutMapping("sales/{id}")
+    @Operation(description = "Update Sales/Purchase Order")
+    public ResponseEntity<ObjectUtils.Null> updateSalesOrder(@Valid @RequestBody AccountDto dto,
+                                                        @NotNull @PathVariable("id") Long id,
+                                                        @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
+
+        this.orderService.updateSalesOrder();
         return ResponseEntity.noContent().build();
     }
 

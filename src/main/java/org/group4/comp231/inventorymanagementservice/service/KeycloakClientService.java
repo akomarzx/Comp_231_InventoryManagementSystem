@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class KeycloakClientService extends BaseService{
+public class KeycloakClientService extends BaseService {
     private final KeycloakClientConfig clientConfig;
     private final StaticCodeService staticCodeService;
     private final UserRepresentationMapper userRepresentationMapper;

@@ -3,6 +3,7 @@ package org.group4.comp231.inventorymanagementservice.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.group4.comp231.inventorymanagementservice.utility.OrderStatusConverter;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -40,8 +41,9 @@ public class Order {
     @Column(name = "account_id", nullable = false)
     private Long account;
 
-    @Column(name = "order_status")
-    private Long orderStatus;
+    @Column(name = "order_status", nullable = false)
+    @Convert(converter = OrderStatusConverter.class)
+    private OrderStatus orderStatus;
 
     @NotNull
     @Column(name = "created_at", nullable = false)
@@ -109,11 +111,11 @@ public class Order {
         this.account = account;
     }
 
-    public Long getOrderStatus() {
+    public OrderStatus getOrderStatus() {
         return orderStatus;
     }
 
-    public void setOrderStatus(Long orderStatus) {
+    public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }
 

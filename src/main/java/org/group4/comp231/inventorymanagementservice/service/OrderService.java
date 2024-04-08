@@ -1,12 +1,9 @@
 package org.group4.comp231.inventorymanagementservice.service;
 
 import jakarta.transaction.Transactional;
-import org.group4.comp231.inventorymanagementservice.OrderStatusChange;
+import org.group4.comp231.inventorymanagementservice.domain.OrderStatusChange;
 import org.group4.comp231.inventorymanagementservice.config.TenantIdentifierResolver;
-import org.group4.comp231.inventorymanagementservice.domain.Account;
-import org.group4.comp231.inventorymanagementservice.domain.Inventory;
-import org.group4.comp231.inventorymanagementservice.domain.Order;
-import org.group4.comp231.inventorymanagementservice.domain.OrderItem;
+import org.group4.comp231.inventorymanagementservice.domain.*;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeBook;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeValue;
 import org.group4.comp231.inventorymanagementservice.dto.order.OrderDto;
@@ -21,6 +18,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 public class OrderService extends BaseService {
@@ -50,13 +48,18 @@ public class OrderService extends BaseService {
         validateCreateOrderRequest(dto);
 
         Order newOrder = this.orderMapper.toEntity(dto);
-        Long initialStatus = dto.orderType().equals(this.staticCodeService.SALES_ORDER_CODE_VALUE_ID) ? this.staticCodeService.PENDING_SALES_ORDER_STATUS_CODE_VALUE_ID : this.staticCodeService.PENDING_PURCHASE_ORDER_STATUS_CODE_VALUE_ID;
+
+        OrderStatus initialStatus = dto.orderType().equals(this.staticCodeService.SALES_ORDER_CODE_VALUE_ID)
+                ? OrderStatus.SALES_ORDER_PENDING
+                : OrderStatus.PURCHASE_ORDER_PENDING;
+
         newOrder.setCreatedAt(Instant.now());
         newOrder.setCreatedBy(createdBy);
         newOrder.setTenant(this.tenantIdentifierResolver.resolveCurrentTenantIdentifier());
         newOrder.setOrderStatus(initialStatus);
         newOrder = this.orderRepository.save(newOrder);
 
+        // Keep Track of Status Changes
         OrderStatusChange newStatusChange = new OrderStatusChange();
         newStatusChange.setOrderStatus(initialStatus);
         newStatusChange.setOrder(newOrder.getId());
@@ -69,8 +72,12 @@ public class OrderService extends BaseService {
             if (inventory.isEmpty()) {
                 throw new Exception("Inventory item not found - ID: " + orderItemDTO.id());
             } else {
-                if (inventory.get().getQuantity() < orderItemDTO.quantity()) {
-                    throw new Exception("Not enough item for this inventory - ID: " + orderItemDTO.id());
+                if (dto.orderType().equals(this.staticCodeService.SALES_ORDER_CODE_VALUE_ID)) {
+                    if (inventory.get().getQuantity() < orderItemDTO.quantity()) {
+                        throw new Exception("Not enough item for this inventory - ID: " + orderItemDTO.id());
+                    }
+                    // Sales Order Reduce Stock Available After Creating
+                    inventory.get().setQuantity(inventory.get().getQuantity() - orderItemDTO.quantity());
                 }
             }
 
@@ -88,7 +95,7 @@ public class OrderService extends BaseService {
     }
 
     @Transactional
-    public void updateOrder() {
+    public void updateSalesOrder() {
 
     }
 
@@ -113,9 +120,9 @@ public class OrderService extends BaseService {
         }
     }
 
-    private Long getNextStage(Long orderType, Long currentStage) throws Exception {
+    private OrderStatus getNextStage(Long orderType, Long currentStage) throws Exception {
 
-        Long codeBookId = orderType = orderType.equals(this.staticCodeService.SALES_ORDER_CODE_VALUE_ID)
+        Long codeBookId = orderType.equals(this.staticCodeService.SALES_ORDER_CODE_VALUE_ID)
                 ? this.staticCodeService.CODEBOOK_SALES_ORDER_STATUS_ID
                 : this.staticCodeService.CODEBOOK_PURCHASE_ORDER_STATUS_ID;
 
@@ -136,11 +143,13 @@ public class OrderService extends BaseService {
             throw new Exception("Unknown error had occurred");
         } else {
 
-
             if (index >= valList.size() - 1) {
-                throw new Exception("Order cannot be move to the next stage as this order is complete.");
+                throw new Exception("Order cannot be move to the next stage as this order was complete.");
             } else {
-                return valList.get(index + 1).getId();
+                return Stream.of(OrderStatus.values())
+                        .filter(c -> c.getCode().equals(valList.get(index + 1).getId()))
+                        .findFirst()
+                        .orElseThrow(IllegalArgumentException::new);
             }
         }
     }
