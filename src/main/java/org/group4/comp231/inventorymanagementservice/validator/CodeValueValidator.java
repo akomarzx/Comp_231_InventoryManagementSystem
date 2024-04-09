@@ -28,7 +28,7 @@ public class CodeValueValidator implements ConstraintValidator<ValidateCodeID, L
 
     @Override
     public boolean isValid(Long id, ConstraintValidatorContext constraintValidatorContext) {
-        Optional<CodeBook> codeValueList = this.staticCodeService.getGCodeValueListUsingCodeBookID(codeBookID);
+        Optional<CodeBook> codeValueList = this.staticCodeService.getCodeValueListUsingCodeBookID(codeBookID);
         if (id == null) {
             return true;
         }
@@ -41,7 +41,13 @@ public class CodeValueValidator implements ConstraintValidator<ValidateCodeID, L
         } else if (parameter.equalsIgnoreCase("COUNTRY")) {
             return  this.staticCodeService.CODEBOOK_COUNTRY_ID;
         } else if (parameter.equalsIgnoreCase("ACCOUNTTYPE")) {
-            return this.staticCodeService.ACCOUNT_TYPE_ID;
+            return this.staticCodeService.CODEBOOK_ACCOUNT_TYPE_ID;
+        } else if (parameter.equalsIgnoreCase("ORDERTYPE")) {
+            return this.staticCodeService.CODEBOOK_ORDER_TYPE_ID;
+        } else if (parameter.equalsIgnoreCase("SALESORDERSTATUS")) {
+            return this.staticCodeService.CODEBOOK_SALES_ORDER_STATUS_ID;
+        } else if (parameter.equalsIgnoreCase("PURCHASEORDERSTATUS")) {
+            return this.staticCodeService.CODEBOOK_PURCHASE_ORDER_STATUS_ID;
         } else {
             return null;
         }

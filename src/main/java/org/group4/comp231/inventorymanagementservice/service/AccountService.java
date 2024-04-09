@@ -15,22 +15,36 @@ import java.util.Optional;
 
 @Service
 public class AccountService extends BaseService {
+
     private final AccountRepository accountRepository;
     private final AccountMapper accountMapper;
     private final TenantIdentifierResolver tenantIdentifierResolver;
+    private final StaticCodeService staticCodeService;
+    private final String ACCOUNT_TYPE_CUSTOMER = "customer";
+    private final String ACCOUNT_TYPE_VENDOR = "vendor";
 
-    public AccountService(AccountRepository accountRepository, AccountMapper accountMapper, TenantIdentifierResolver tenantIdentifierResolver) {
+    public AccountService(AccountRepository accountRepository, AccountMapper accountMapper, TenantIdentifierResolver tenantIdentifierResolver, StaticCodeService staticCodeService) {
         this.accountRepository = accountRepository;
         this.accountMapper = accountMapper;
         this.tenantIdentifierResolver = tenantIdentifierResolver;
+        this.staticCodeService = staticCodeService;
     }
 
     @Transactional
-    public List<AccountSummaryInfo> getAllAccount() {
-        return this.accountRepository.findAllBy();
+    public List<AccountSummaryInfo> getAllAccount(String type) {
+
+        Long accountTypeCodeValueId = this.getAccountTypeCodeValueId(type);
+
+        if (accountTypeCodeValueId == null) {
+            return this.accountRepository.findAllBy();
+        } else {
+            return accountRepository.findByAccountType(accountTypeCodeValueId);
+        }
+
     }
 
     public void createAccount(AccountDto dto, String createdBy) {
+
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         Account newAccount = this.accountMapper.partialUpdate(dto, new Account());
         newAccount.getAddress().setTenant(tenantId);
@@ -40,6 +54,7 @@ public class AccountService extends BaseService {
         newAccount.setCreatedBy(createdBy);
         newAccount.setCreatedAt(Instant.now());
         this.accountRepository.save(newAccount);
+
     }
 
     @Transactional
@@ -73,5 +88,22 @@ public class AccountService extends BaseService {
         }
 
         this.accountRepository.deleteById(id);
+    }
+
+    private Long getAccountTypeCodeValueId(String type) {
+
+        Long codeValueId = null;
+
+        if(type == null) {
+            return  codeValueId;
+        }
+
+        if(type.equals(ACCOUNT_TYPE_CUSTOMER)) {
+            codeValueId = this.staticCodeService.SELLER_ACCOUNT_CODE_VALUE_ID;
+        }
+        else if (type.equals(ACCOUNT_TYPE_VENDOR)) {
+            codeValueId = this.staticCodeService.VENDOR_ACCOUNT_CODE_VALUE_ID;
+        }
+        return  codeValueId;
     }
 }
