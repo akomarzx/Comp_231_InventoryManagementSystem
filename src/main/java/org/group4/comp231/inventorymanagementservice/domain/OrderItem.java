@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.TenantId;
 
 import java.time.Instant;
 
@@ -25,6 +26,7 @@ public class OrderItem {
     private Long order;
 
     @NotNull
+    @TenantId
     @Column(name = "tenant_id", nullable = false)
     private Long tenant;
 

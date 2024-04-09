@@ -3,13 +3,11 @@ package org.group4.comp231.inventorymanagementservice.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.ObjectUtils;
-import org.group4.comp231.inventorymanagementservice.dto.order.OrderDto;
-import org.group4.comp231.inventorymanagementservice.dto.order.OrderItemDTO;
-import org.group4.comp231.inventorymanagementservice.dto.account.AccountDto;
-import org.group4.comp231.inventorymanagementservice.dto.order.CreateOrderDTO;
+import org.group4.comp231.inventorymanagementservice.domain.Order;
+import org.group4.comp231.inventorymanagementservice.dto.order.*;
 import org.group4.comp231.inventorymanagementservice.service.OrderService;
 import org.group4.comp231.inventorymanagementservice.service.StaticCodeService;
 import org.group4.comp231.inventorymanagementservice.utility.ValidationGroups.Create;
@@ -20,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,17 +29,16 @@ import java.util.UUID;
 public class OrderController extends BaseController {
 
     private final OrderService orderService;
-    private final StaticCodeService staticCodeService;
 
-    public OrderController(OrderService orderService, StaticCodeService staticCodeService) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
-        this.staticCodeService = staticCodeService;
     }
 
-//    @GetMapping
-//    @Operation(description = "Get All Accounts")
-//    public ResponseEntity<List<AccountSummaryInfo>> getAllAccount(@RequestParam(required = false) String type) {
-//    }
+    @GetMapping
+    @Operation(description = "Get All Orders")
+    public ResponseEntity<List<Order>> getAllOrders(@RequestParam(required = false) String type) {
+        return new ResponseEntity<>(this.orderService.getAllOrders(), HttpStatus.OK);
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -55,23 +53,23 @@ public class OrderController extends BaseController {
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
-//    @PutMapping("purchase/{id}")
-//    @Operation(description = "Update Sales/Purchase Order")
-//    public ResponseEntity<ObjectUtils.Null> updatePurchaseOrder(@Valid @RequestBody AccountDto dto,
-//                                                          @NotNull @PathVariable("id") Long id,
-//                                                          @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
-//
-//        this.orderService.updateOrder();
-//        return ResponseEntity.noContent().build();
-//    }
+    @PutMapping("purchase/{id}")
+    @Operation(description = "Update Sales/Purchase Order")
+    public ResponseEntity<ObjectUtils.Null> updatePurchaseOrder(@RequestBody ProcessOrderDTO dto,
+                                                                @NotNull @PathVariable("id") Long id,
+                                                                @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
+
+        this.orderService.updatePurchaseOrder(id, dto, updatedBy);
+        return ResponseEntity.noContent().build();
+    }
 
     @PutMapping("sales/{id}")
     @Operation(description = "Update Sales/Purchase Order")
-    public ResponseEntity<ObjectUtils.Null> updateSalesOrder(
-                                                        @NotNull @PathVariable("id") Long id,
-                                                        @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
+    public ResponseEntity<ObjectUtils.Null> updateSalesOrder(@NotNull @RequestBody ProcessOrderDTO salesOrderDTO,
+                                                             @NotNull @PathVariable("id") Long id,
+                                                             @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
 
-        this.orderService.updateSalesOrder();
+        this.orderService.updateSalesOrder(id, salesOrderDTO, updatedBy);
         return ResponseEntity.noContent().build();
     }
 

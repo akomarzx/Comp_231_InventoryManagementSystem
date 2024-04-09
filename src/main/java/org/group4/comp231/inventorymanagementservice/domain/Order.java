@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.group4.comp231.inventorymanagementservice.utility.OrderStatusConverter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.TenantId;
 
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -30,6 +33,7 @@ public class Order {
     private String orderReferenceNumber;
 
     @NotNull
+    @TenantId
     @Column(name = "tenant_id", nullable = false)
     private Long tenant;
 
@@ -69,7 +73,22 @@ public class Order {
     private Long warehouse;
 
     @OneToMany(mappedBy = "order")
+    @Fetch(FetchMode.JOIN)
     private Set<OrderItem> orderItems = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "order")
+    @Fetch(FetchMode.JOIN)
+    private Set<OrderStatusChange> orderStatusChanges = new LinkedHashSet<>();
+
+    @Transient
+    private Long statusCodeId;
+    public Set<OrderStatusChange> getOrderStatusChanges() {
+        return orderStatusChanges;
+    }
+
+    public void setOrderStatusChanges(Set<OrderStatusChange> orderStatusChanges) {
+        this.orderStatusChanges = orderStatusChanges;
+    }
 
     public Long getId() {
         return id;
@@ -173,5 +192,13 @@ public class Order {
 
     public void setOrderItems(Set<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public Long getStatusCodeId() {
+        return statusCodeId;
+    }
+
+    public void setStatusCodeId(Long statusCodeId) {
+        this.statusCodeId = statusCodeId;
     }
 }

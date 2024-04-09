@@ -1,6 +1,6 @@
 
 ALTER TABLE `order`
-    ADD constraint ck_order_warehouse_id_correct_order_type CHECK (order_type = 500020 and warehouse_id is null);
+    ADD constraint ck_order_warehouse_id_correct_order_type CHECK (order_type = 500020 and warehouse_id is not null);
 
 update `code_book`
 set label = 'Sales Order Status', updated_at = current_timestamp(), updated_by = 'rombao@my.centennialcollege.ca'

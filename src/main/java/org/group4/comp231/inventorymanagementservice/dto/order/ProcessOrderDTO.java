@@ -1,7 +1,6 @@
 package org.group4.comp231.inventorymanagementservice.dto.order;
 
 import jakarta.validation.constraints.NotNull;
-import org.group4.comp231.inventorymanagementservice.annotation.ValidateCodeID;
 
 import java.util.List;
 
@@ -10,8 +9,8 @@ import java.util.List;
  * @param processCodeValueId Value for which stage of the sales order that is currently being performed
  * @param orderItems
  */
-public record ProcessSalesOrderDTO (
-        @NotNull @ValidateCodeID(codeTypeName = "SALESORDERSTATUS") Long processCodeValueId,
+public record ProcessOrderDTO(
+        @NotNull Long processCodeValueId,
         List<OrderItemDTO> orderItems
 ) {
 }

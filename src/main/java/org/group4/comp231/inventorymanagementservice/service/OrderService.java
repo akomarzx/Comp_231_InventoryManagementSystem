@@ -7,8 +7,9 @@ import org.group4.comp231.inventorymanagementservice.domain.*;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeBook;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeValue;
 import org.group4.comp231.inventorymanagementservice.dto.order.OrderDto;
+import org.group4.comp231.inventorymanagementservice.dto.order.OrderInfo;
 import org.group4.comp231.inventorymanagementservice.dto.order.OrderItemDTO;
-import org.group4.comp231.inventorymanagementservice.dto.order.ProcessSalesOrderDTO;
+import org.group4.comp231.inventorymanagementservice.dto.order.ProcessOrderDTO;
 import org.group4.comp231.inventorymanagementservice.mapper.order.OrderMapper;
 import org.group4.comp231.inventorymanagementservice.repository.*;
 import org.mapstruct.factory.Mappers;
@@ -43,6 +44,20 @@ public class OrderService extends BaseService {
         this.orderStatusChangeRepository = orderStatusChangeRepository;
     }
 
+    // TODO: Heavy operation need to be reworked. Enum String is returned instead of code value id
+    // Might need to redo the domain object
+    @Transactional
+    public List<Order> getAllOrders() {
+        List<Order> orders = this.orderRepository.findAll();
+        for (Order order : orders) {
+            order.setStatusCodeId(order.getOrderStatus().getCode());
+            for (OrderStatusChange statusChange : order.getOrderStatusChanges()) {
+                statusChange.setStatusCodeId(statusChange.getOrderStatus().getCode());
+            }
+        }
+
+        return orders;
+    }
     @Transactional
     public void createOrder(OrderDto dto, String createdBy) throws Exception {
 
@@ -96,7 +111,7 @@ public class OrderService extends BaseService {
     }
 
     @Transactional
-    public void updateSalesOrder(Long orderId, ProcessSalesOrderDTO salesOrderDTO, String updatedBy) throws Exception {
+    public void updateSalesOrder(Long orderId, ProcessOrderDTO salesOrderDTO, String updatedBy) throws Exception {
 
         OrderStatus nextUpdateStatus = resolveOrderStatus(salesOrderDTO.processCodeValueId());
         Optional<Order> currentOrder = this.orderRepository.findById(orderId);
@@ -153,10 +168,109 @@ public class OrderService extends BaseService {
                     //TODO : Update existing order status Change
                 }
             }
+            // For brevity, we can only mark something as shipped when everything was packed
+            case SALES_ORDER_SHIPPED -> {
+                List<OrderItem> orderItems = new ArrayList<>(currentOrder.get().getOrderItems());
 
-            case SALES_ORDER_SHIPPED ->
+                for (OrderItem orderItem : orderItems) {
+                    if (orderItem.getQuantityProcessed() < orderItem.getQuantity()) {
+                        throw new Exception("Not all items are packed yet.");
+                    }
+                }
+
+                createOrderStatusChange(updatedBy, OrderStatus.SALES_ORDER_SHIPPED, orderId);
+                createOrderStatusChange(updatedBy, OrderStatus.SALES_ORDER_CLOSED, orderId);
+                currentOrder.get().setOrderStatus(OrderStatus.SALES_ORDER_CLOSED);
+                currentOrder.get().setUpdatedAt(Instant.now());
+                currentOrder.get().setUpdatedBy(updatedBy);
+                this.orderRepository.save(currentOrder.get());
+            }
+            default -> {
+                throw new Exception("Invalid Process Id");
+            }
         }
+    }
+    @Transactional
+    public void updatePurchaseOrder(Long orderId, ProcessOrderDTO purchaseOrderDto, String updatedBy) throws Exception {
 
+            OrderStatus nextUpdateStatus = resolveOrderStatus(purchaseOrderDto.processCodeValueId());
+            Optional<Order> currentOrder = this.orderRepository.findById(orderId);
+            List<OrderStatusChange> orderStatusChanges = this.getOrderStatusChanges(orderId);
+
+            if (currentOrder.isEmpty()) {
+                throw new Exception("Order not found - ID: " + orderId);
+            }
+
+            if (currentOrder.get().getOrderStatus().equals(OrderStatus.SALES_ORDER_CLOSED)) {
+                throw new Exception("Order Closed/Completed - ID: " + orderId);
+            }
+
+            switch(nextUpdateStatus) {
+
+                case PURCHASE_ORDER_PO_SENT -> {
+                    if (!checkIfThereAreLaterStagesOrStageAlreadyExist(OrderStatus.PURCHASE_ORDER_PO_SENT, orderStatusChanges)) {
+                        createOrderStatusChange(updatedBy, OrderStatus.PURCHASE_ORDER_PO_SENT, orderId);
+                    }
+                }
+                // Create Partially received if not all items are received
+                case PURCHASE_ORDER_RECEIVED -> {
+
+                    if (purchaseOrderDto.orderItems() == null || purchaseOrderDto.orderItems().isEmpty()) {
+                        throw new Exception("Order Items cannot be null or empty when Receiving");
+                    }
+
+                    for (OrderItemDTO orderItemDTO : purchaseOrderDto.orderItems()) {
+                        OrderItem orderItem = currentOrder.get().getOrderItems()
+                                .stream()
+                                .filter(oi -> oi.getId().equals(orderItemDTO.id()))
+                                .findFirst().orElseThrow();
+
+                        if (orderItem.getQuantityProcessed() + orderItemDTO.quantity() > orderItem.getQuantity()) {
+                            throw new Exception("Quantity exceeds available quantity to be processed");
+                        }
+
+                        Optional<Inventory> inventory = this.inventoryRepository.findById(orderItem.getInventory());
+
+                        if (inventory.isEmpty()) {
+                            throw new Exception("Inventory Item not found" );
+                        }
+
+                        inventory.get().setUpdatedBy(updatedBy);
+                        inventory.get().setUpdatedAt(Instant.now());
+                        inventory.get().setQuantity(inventory.get().getQuantity() + orderItemDTO.quantity());
+                        this.inventoryRepository.save(inventory.get());
+
+                        orderItem.setQuantityProcessed(orderItem.getQuantityProcessed() + orderItemDTO.quantity());
+                        orderItem.setUpdatedAt(Instant.now());
+                        orderItem.setUpdatedBy(updatedBy);
+                        this.orderItemRepository.save(orderItem);
+                    }
+
+                    List<OrderItem> orderItems = new ArrayList<>(currentOrder.get().getOrderItems());
+                    boolean isPartial = false;
+
+                    for (OrderItem orderItem : orderItems) {
+                        if (orderItem.getQuantityProcessed() < orderItem.getQuantity()) {
+                            if (!checkIfOrderStatusChangeExist(OrderStatus.PURCHASE_ORDER_PARTIALLY_RECEVIED, orderStatusChanges)) {
+                                createOrderStatusChange(updatedBy, OrderStatus.PURCHASE_ORDER_PARTIALLY_RECEVIED, orderId);
+                            }
+                            isPartial = true;
+                        }
+                    }
+
+                    if (!isPartial) {
+                        createOrderStatusChange(updatedBy, OrderStatus.PURCHASE_ORDER_RECEIVED, orderId);
+                        createOrderStatusChange(updatedBy, OrderStatus.PURCHASE_ORDER_CLOSED, orderId);
+                        currentOrder.get().setOrderStatus(OrderStatus.PURCHASE_ORDER_CLOSED);
+                        currentOrder.get().setUpdatedAt(Instant.now());
+                        currentOrder.get().setUpdatedBy(updatedBy);
+                        this.orderRepository.save(currentOrder.get());
+                    }
+                }
+                default -> {
+                    throw new Exception("Invalid Process Id");
+                }
+            }
     }
 
     private void validateCreateOrderRequest(OrderDto dto) throws Exception {
@@ -265,7 +379,7 @@ public class OrderService extends BaseService {
     private void createOrderStatusChange(String createdBy, OrderStatus orderStatus, Long orderId) {
         OrderStatusChange orderStatusChange = new OrderStatusChange();
         orderStatusChange.setCreatedBy(createdBy);
-        orderStatusChange.setOrderStatus(OrderStatus.SALES_ORDER_INVOICED);
+        orderStatusChange.setOrderStatus(orderStatus);
         orderStatusChange.setCreatedAt(Instant.now());
         orderStatusChange.setOrder(orderId);
         this.orderStatusChangeRepository.save(orderStatusChange);

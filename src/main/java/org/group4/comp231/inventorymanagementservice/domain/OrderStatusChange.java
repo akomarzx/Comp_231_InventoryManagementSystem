@@ -44,6 +44,9 @@ public class OrderStatusChange {
     @Column(name = "notes")
     private String notes;
 
+    @Transient
+    private Long statusCodeId;
+
     public Long getId() {
         return id;
     }
@@ -106,5 +109,13 @@ public class OrderStatusChange {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public Long getStatusCodeId() {
+        return statusCodeId;
+    }
+
+    public void setStatusCodeId(Long statusCodeId) {
+        this.statusCodeId = statusCodeId;
     }
 }
