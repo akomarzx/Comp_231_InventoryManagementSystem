@@ -7,7 +7,6 @@ import org.group4.comp231.inventorymanagementservice.domain.*;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeBook;
 import org.group4.comp231.inventorymanagementservice.domain.static_code.CodeValue;
 import org.group4.comp231.inventorymanagementservice.dto.order.OrderDto;
-import org.group4.comp231.inventorymanagementservice.dto.order.OrderInfo;
 import org.group4.comp231.inventorymanagementservice.dto.order.OrderItemDTO;
 import org.group4.comp231.inventorymanagementservice.dto.order.ProcessOrderDTO;
 import org.group4.comp231.inventorymanagementservice.mapper.order.OrderMapper;
@@ -47,8 +46,9 @@ public class OrderService extends BaseService {
     // TODO: Heavy operation need to be reworked. Enum String is returned instead of code value id
     // Might need to redo the domain object
     @Transactional
-    public List<Order> getAllOrders() {
-        List<Order> orders = this.orderRepository.findAll();
+    public List<Order> getAllOrders(String type) {
+        Long orderTypeId = getOrderTypeCodeValueId(type);
+        List<Order> orders = orderRepository.findByOrderTypeAndTenant(orderTypeId, this.tenantIdentifierResolver.resolveCurrentTenantIdentifier());
         for (Order order : orders) {
             order.setStatusCodeId(order.getOrderStatus().getCode());
             for (OrderStatusChange statusChange : order.getOrderStatusChanges()) {
@@ -383,5 +383,23 @@ public class OrderService extends BaseService {
         orderStatusChange.setCreatedAt(Instant.now());
         orderStatusChange.setOrder(orderId);
         this.orderStatusChangeRepository.save(orderStatusChange);
+    }
+    private Long getOrderTypeCodeValueId(String type) {
+
+        final String ORDER_TYPE_SALES = "sales";
+        final String ORDER_TYPE_PURCHASE = "purchase";
+        Long codeValueId = null;
+
+        if(type == null) {
+            return  codeValueId;
+        }
+
+        if(type.equals(ORDER_TYPE_SALES)) {
+            codeValueId = this.staticCodeService.SALES_ORDER_CODE_VALUE_ID;
+        }
+        else if (type.equals(ORDER_TYPE_PURCHASE)) {
+            codeValueId = this.staticCodeService.PURCHASE_ORDER_CODE_VALUE_ID;
+        }
+        return  codeValueId;
     }
 }

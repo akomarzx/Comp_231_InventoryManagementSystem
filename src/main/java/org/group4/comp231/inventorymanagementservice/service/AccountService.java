@@ -31,6 +31,11 @@ public class AccountService extends BaseService {
     }
 
     @Transactional
+    public AccountSummaryInfo getAccount(Long id) {
+            return accountRepository.findBy(id);
+    }
+
+    @Transactional
     public List<AccountSummaryInfo> getAllAccount(String type) {
 
         Long accountTypeCodeValueId = this.getAccountTypeCodeValueId(type);
