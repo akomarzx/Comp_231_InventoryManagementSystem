@@ -37,7 +37,7 @@ public class OrderController extends BaseController {
     @GetMapping
     @Operation(description = "Get All Orders")
     public ResponseEntity<List<Order>> getAllOrders(@RequestParam(required = false) String type) {
-        return new ResponseEntity<>(this.orderService.getAllOrders(), HttpStatus.OK);
+        return new ResponseEntity<>(this.orderService.getAllOrders(type), HttpStatus.OK);
     }
 
     @PostMapping

@@ -9,9 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, Long>, JpaSpecificationExecutor<Account> {
+
     List<AccountSummaryInfo> findAllBy();
 
     Optional<Account> findByTenantAndId(Long tenantId, Long id);
 
     List<AccountSummaryInfo> findByAccountType(Long accountType);
+
+    AccountSummaryInfo findAccountById(Long id);
 }

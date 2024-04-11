@@ -29,6 +29,11 @@ public class AccountController extends BaseController {
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
+    @GetMapping("/{id}")
+    @Operation(description = "Get All Accounts")
+    public ResponseEntity<AccountSummaryInfo> getAccount(@NotNull @PathVariable("id") Long id) {
+        return new ResponseEntity<>(this.accountService.getAccount(id), HttpStatus.OK);
+    }
 
     @GetMapping
     @Operation(description = "Get All Accounts")

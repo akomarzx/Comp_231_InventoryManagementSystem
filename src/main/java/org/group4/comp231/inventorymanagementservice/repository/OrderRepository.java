@@ -8,4 +8,8 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     public List<OrderInfo> findAllBy();
+
+    List<Order> findByAccountAndTenant(Long account, Long tenant);
+
+    List<Order> findByOrderTypeAndTenant(Long orderType, Long tenant);
 }
