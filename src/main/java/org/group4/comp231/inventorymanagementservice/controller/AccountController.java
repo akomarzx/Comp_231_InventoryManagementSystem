@@ -31,7 +31,7 @@ public class AccountController extends BaseController {
     }
     @GetMapping("/{id}")
     @Operation(description = "Get All Accounts")
-    public ResponseEntity<AccountSummaryInfo> getAccount(@NotNull @PathVariable("id") Long id,String type) {
+    public ResponseEntity<AccountSummaryInfo> getAccount(@NotNull @PathVariable("id") Long id) {
         return new ResponseEntity<>(this.accountService.getAccount(id), HttpStatus.OK);
     }
 

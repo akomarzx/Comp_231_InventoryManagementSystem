@@ -32,7 +32,7 @@ public class AccountService extends BaseService {
 
     @Transactional
     public AccountSummaryInfo getAccount(Long id) {
-            return accountRepository.findBy(id);
+            return accountRepository.findAccountById(id);
     }
 
     @Transactional
