@@ -201,7 +201,7 @@ public class OrderService extends BaseService {
                 throw new Exception("Order not found - ID: " + orderId);
             }
 
-            if (currentOrder.get().getOrderStatus().equals(OrderStatus.SALES_ORDER_CLOSED)) {
+            if (currentOrder.get().getOrderStatus().equals(OrderStatus.PURCHASE_ORDER_CLOSED)) {
                 throw new Exception("Order Closed/Completed - ID: " + orderId);
             }
 
@@ -210,6 +210,8 @@ public class OrderService extends BaseService {
                 case PURCHASE_ORDER_PO_SENT -> {
                     if (!checkIfThereAreLaterStagesOrStageAlreadyExist(OrderStatus.PURCHASE_ORDER_PO_SENT, orderStatusChanges)) {
                         createOrderStatusChange(updatedBy, OrderStatus.PURCHASE_ORDER_PO_SENT, orderId);
+                        currentOrder.get().setOrderStatus(OrderStatus.PURCHASE_ORDER_PO_SENT);
+                        this.orderRepository.save(currentOrder.get());
                     }
                 }
                 // Create Partially received if not all items are received
@@ -223,7 +225,7 @@ public class OrderService extends BaseService {
                         OrderItem orderItem = currentOrder.get().getOrderItems()
                                 .stream()
                                 .filter(oi -> oi.getId().equals(orderItemDTO.id()))
-                                .findFirst().orElseThrow();
+                                .findFirst().orElseThrow(() -> new Exception("Order Item not found"));
 
                         if (orderItem.getQuantityProcessed() + orderItemDTO.quantity() > orderItem.getQuantity()) {
                             throw new Exception("Quantity exceeds available quantity to be processed");
@@ -255,17 +257,22 @@ public class OrderService extends BaseService {
                                 createOrderStatusChange(updatedBy, OrderStatus.PURCHASE_ORDER_PARTIALLY_RECEVIED, orderId);
                             }
                             isPartial = true;
+                            break;
                         }
                     }
 
-                    if (!isPartial) {
+                    if (isPartial) {
+                        currentOrder.get().setOrderStatus(OrderStatus.PURCHASE_ORDER_PARTIALLY_RECEVIED);
+                    } else {
                         createOrderStatusChange(updatedBy, OrderStatus.PURCHASE_ORDER_RECEIVED, orderId);
                         createOrderStatusChange(updatedBy, OrderStatus.PURCHASE_ORDER_CLOSED, orderId);
                         currentOrder.get().setOrderStatus(OrderStatus.PURCHASE_ORDER_CLOSED);
-                        currentOrder.get().setUpdatedAt(Instant.now());
-                        currentOrder.get().setUpdatedBy(updatedBy);
-                        this.orderRepository.save(currentOrder.get());
                     }
+
+                    currentOrder.get().setUpdatedAt(Instant.now());
+                    currentOrder.get().setUpdatedBy(updatedBy);
+                    this.orderRepository.save(currentOrder.get());
+
                 }
                 default -> {
                     throw new Exception("Invalid Process Id");
