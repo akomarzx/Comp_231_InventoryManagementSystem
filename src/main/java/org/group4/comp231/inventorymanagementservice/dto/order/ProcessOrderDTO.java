@@ -1,5 +1,6 @@
 package org.group4.comp231.inventorymanagementservice.dto.order;
 
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
@@ -11,6 +12,6 @@ import java.util.List;
  */
 public record ProcessOrderDTO(
         @NotNull Long processCodeValueId,
-        List<OrderItemDTO> orderItems
+        @NotEmpty List<OrderItemDTO> orderItems
 ) {
 }
