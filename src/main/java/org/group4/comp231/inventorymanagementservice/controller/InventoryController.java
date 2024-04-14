@@ -8,15 +8,18 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.group4.comp231.inventorymanagementservice.domain.ViewProductSummary;
 import org.group4.comp231.inventorymanagementservice.dto.inventory.InventoryByLocationInfo;
 import org.group4.comp231.inventorymanagementservice.dto.inventory.InventoryDto;
+import org.group4.comp231.inventorymanagementservice.service.AWSS3Service;
 import org.group4.comp231.inventorymanagementservice.service.InventoryService;
 import org.group4.comp231.inventorymanagementservice.utility.ValidationGroups.Create;
 import org.group4.comp231.inventorymanagementservice.utility.ValidationGroups.Update;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,9 +30,11 @@ import java.util.List;
 public class InventoryController extends BaseController {
 
     private final InventoryService inventoryService;
+    private final AWSS3Service awss3Service;
 
-    public InventoryController(InventoryService inventoryService) {
+    public InventoryController(InventoryService inventoryService, AWSS3Service awss3Service) {
         this.inventoryService = inventoryService;
+        this.awss3Service = awss3Service;
     }
 
     @GetMapping
@@ -88,4 +93,10 @@ public class InventoryController extends BaseController {
         this.inventoryService.deleteInventory(productId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public String uploadFile(@RequestParam("file") MultipartFile file) {
+        return awss3Service.uploadFile(file.getOriginalFilename(), file);
+    }
+
 }
