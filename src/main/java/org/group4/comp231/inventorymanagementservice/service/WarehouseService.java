@@ -25,11 +25,20 @@ public class WarehouseService extends BaseService {
         this.tenantIdentifierResolver = tenantIdentifierResolver;
     }
 
+    /**
+     * Get A short summary of each warehouse
+     * @return
+     */
     @Transactional
     public List<WarehouseInfo> getWarehouse() {
         return this.warehouseRepository.findAllBy();
     }
 
+    /**
+     * Create new warehouse or location to where inventory items get shipped
+     * @param dto
+     * @param createdBy
+     */
     public void createWarehouse(WarehouseDto dto, String createdBy) {
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         Warehouse newWarehouse = this.warehouseMapper.partialUpdate(dto, new Warehouse());
@@ -42,6 +51,13 @@ public class WarehouseService extends BaseService {
         this.warehouseRepository.save(newWarehouse);
     }
 
+    /**
+     * Update Warehouse
+     * @param categoryId
+     * @param dto
+     * @param updatedBy
+     * @throws Exception If warehouse entity was not found
+     */
     @Transactional
     public void updateWarehouse(Long categoryId, WarehouseDto dto, String updatedBy) throws Exception {
 
@@ -64,6 +80,10 @@ public class WarehouseService extends BaseService {
         }
     }
 
+    /**
+     * Delete Warehouse Location
+     * @param id
+     */
     @Transactional
     public void deleteWarehouse(Long id) {
         this.warehouseRepository.deleteById(id);

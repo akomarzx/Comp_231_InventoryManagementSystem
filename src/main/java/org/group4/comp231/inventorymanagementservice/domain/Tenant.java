@@ -7,6 +7,9 @@ import org.hibernate.annotations.TenantId;
 
 import java.time.Instant;
 
+/**
+ * Class to represent all tenants or customer registered into the system
+ */
 @Entity
 @Table(name = "tenant", indexes = {
         @Index(name = "label", columnList = "label", unique = true)

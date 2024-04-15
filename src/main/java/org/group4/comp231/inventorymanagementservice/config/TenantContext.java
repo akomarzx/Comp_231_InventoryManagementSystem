@@ -1,5 +1,8 @@
 package org.group4.comp231.inventorymanagementservice.config;
 
+/**
+ * Thread Safe Container for tenant ID
+ */
 public class TenantContext {
     private static ThreadLocal<Long> currentTenant = new InheritableThreadLocal<>();
 

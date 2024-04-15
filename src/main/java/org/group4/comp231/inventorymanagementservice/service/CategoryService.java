@@ -30,6 +30,11 @@ public class CategoryService extends BaseService {
         return this.categoryRepository.findAllBy();
     }
 
+    /**
+     * Create new Product Category
+     * @param createUpdateCategoryDto
+     * @param createdBy
+     */
     public void createCategory(CategoryDto createUpdateCategoryDto, String createdBy) {
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
         this.tenantIdentifierResolver.setCurrentTenant(tenantId);
@@ -40,6 +45,13 @@ public class CategoryService extends BaseService {
         this.categoryRepository.save(newCategory);
     }
 
+    /**
+     * Update Product Category
+     * @param categoryId
+     * @param dto
+     * @param updatedBy
+     * @throws Exception When Entity was not found
+     */
     public void updateCategory(Long categoryId, CategoryDto dto, String updatedBy) throws Exception {
 
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
@@ -57,6 +69,10 @@ public class CategoryService extends BaseService {
         }
     }
 
+    /**
+     * Delete Category By ID
+     * @param categoryId
+     */
     public void deleteCategory(Long categoryId) {
 
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();

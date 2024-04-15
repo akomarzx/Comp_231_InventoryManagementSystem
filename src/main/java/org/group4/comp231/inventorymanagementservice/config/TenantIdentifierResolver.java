@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+/**
+ * Enable Multi Tenancy via discriminator column
+ */
 @Component
 public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver<Long>, HibernatePropertiesCustomizer {
 
@@ -18,7 +21,7 @@ public class TenantIdentifierResolver implements CurrentTenantIdentifierResolver
         if(currentTenant != null) {
             return currentTenant;
         } else {
-            return 0L;
+            return 1L;
         }
     }
 

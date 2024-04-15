@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Service for Static Code for the API
+ */
 @Service
 public class StaticCodeService extends BaseService {
 
@@ -15,7 +18,6 @@ public class StaticCodeService extends BaseService {
 
     private List<CodeBook> codeBook;
 
-    //TODO : Refactor
     public final Long CODEBOOK_COUNTRY_ID = 10000L;
     public final Long CODEBOOK_PROVINCE_ID = 20000L;
     public final Long CODEBOOK_ACCOUNT_TYPE_ID = 60000L;

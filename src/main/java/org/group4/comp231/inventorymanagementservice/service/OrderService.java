@@ -43,8 +43,11 @@ public class OrderService extends BaseService {
         this.orderStatusChangeRepository = orderStatusChangeRepository;
     }
 
-    // TODO: Heavy operation need to be reworked. Enum String is returned instead of code value id
-    // Might need to redo the domain object
+    /**
+     * Get All orders by type
+     * @param type
+     * @return List of Orders
+     */
     @Transactional
     public List<Order> getAllOrders(String type) {
         Long orderTypeId = getOrderTypeCodeValueId(type);
@@ -58,6 +61,13 @@ public class OrderService extends BaseService {
 
         return orders;
     }
+
+    /**
+     * Create New Order Purchase/SALES
+     * @param dto
+     * @param createdBy
+     * @throws Exception
+     */
     @Transactional
     public void createOrder(OrderDto dto, String createdBy) throws Exception {
 
@@ -110,6 +120,14 @@ public class OrderService extends BaseService {
 
     }
 
+    /**
+     * Update Existing Sales Order
+     *
+     * @param orderId
+     * @param salesOrderDTO
+     * @param updatedBy
+     * @throws Exception
+     */
     @Transactional
     public void updateSalesOrder(Long orderId, ProcessOrderDTO salesOrderDTO, String updatedBy) throws Exception {
 
@@ -165,7 +183,6 @@ public class OrderService extends BaseService {
                 if (!checkIfOrderStatusChangeExist(OrderStatus.SALES_ORDER_PACKED, orderStatusChanges)) {
                     createOrderStatusChange(updatedBy, OrderStatus.SALES_ORDER_PACKED, orderId);
                 } else {
-                    //TODO : Update existing order status Change
                 }
             }
             // For brevity, we can only mark something as shipped when everything was packed
@@ -367,7 +384,7 @@ public class OrderService extends BaseService {
      * @param status Order Status To check
      * @return Boolean indication order had been processed to this stage.
      */
-    private Boolean checkIfOrderStatusChangeExist(OrderStatus status, List<OrderStatusChange> orderStatusChanges) {
+    public Boolean checkIfOrderStatusChangeExist(OrderStatus status, List<OrderStatusChange> orderStatusChanges) {
         return orderStatusChanges.stream()
                 .anyMatch(orderStatusChange -> orderStatusChange.getOrderStatus().equals(status));
     }
@@ -378,7 +395,7 @@ public class OrderService extends BaseService {
      * @param orderStatusChanges History of status changes for the order
      * @return Boolean to indicate if there are stage higher or same than this already exist
      */
-    private Boolean checkIfThereAreLaterStagesOrStageAlreadyExist(OrderStatus status, List<OrderStatusChange> orderStatusChanges) {
+    public Boolean checkIfThereAreLaterStagesOrStageAlreadyExist(OrderStatus status, List<OrderStatusChange> orderStatusChanges) {
         return orderStatusChanges.stream()
                 .anyMatch(orderStatusChange -> orderStatusChange.getOrderStatus().getCode() >= status.getCode());
     }
