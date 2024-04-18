@@ -18,5 +18,5 @@ public interface AccountSummaryInfo {
 
     AddressSummaryInfo getAddress();
 
-    Instant getCreated();
+    Instant getCreatedAt();
 }
