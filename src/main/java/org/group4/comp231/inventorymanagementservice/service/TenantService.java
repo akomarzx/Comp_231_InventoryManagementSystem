@@ -36,6 +36,10 @@ public class TenantService extends BaseService {
         return tenant.map(this.tenantMapper::toDto).orElse(null);
     }
 
+    /**
+     * Get All Existing Tenants.
+     * @return
+     */
     public List<TenantDto> getAllTenants() {
 
         List<Tenant> tenants = this.tenantRepository.findAll();
@@ -48,6 +52,10 @@ public class TenantService extends BaseService {
         return tenantDTOList;
     }
 
+    /**
+     * Create New Tenant and Register new user.
+     * @param dto
+     */
     @Transactional(rollbackOn = {WebClientResponseException.class, Exception.class})
     public void createTenant(UserRegistrationDto dto) {
 
@@ -62,9 +70,15 @@ public class TenantService extends BaseService {
 
         //After Creating New Tenant - Create the new user in the IAM platform
         this.keycloakClientService.registerNewUser(dto, newTenant.getId(), true);
-
     }
 
+    /**
+     * Update Tenant
+     * @param id
+     * @param dto
+     * @param username
+     * @return
+     */
     public TenantDto updateTenant(Long id, CreateUpdateTenantDTO dto, String username){
 
         Optional<Tenant> tenant = this.tenantRepository.findById(id);

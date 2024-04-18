@@ -6,6 +6,9 @@ import org.group4.comp231.inventorymanagementservice.domain.OrderStatus;
 
 import java.util.stream.Stream;
 
+/**
+ * Converter for OrderStatus Enum
+ */
 @Converter(autoApply = true)
 public class OrderStatusConverter implements AttributeConverter<OrderStatus, Long> {
 

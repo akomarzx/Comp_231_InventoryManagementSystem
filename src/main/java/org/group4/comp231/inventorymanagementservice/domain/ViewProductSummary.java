@@ -69,6 +69,14 @@ public class ViewProductSummary {
     @Column(name = "description")
     private String description;
 
+    @NotNull
+    @Column(name = "inventory_id", nullable = false)
+    private Long inventoryId;
+
+    public Long getInventoryId() {
+        return inventoryId;
+    }
+
     public String getDescription() {
         return description;
     }

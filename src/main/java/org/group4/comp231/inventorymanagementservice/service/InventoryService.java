@@ -40,11 +40,24 @@ public class InventoryService extends BaseService{
         this.viewProductListRepository = viewProductListRepository;
     }
 
+    /**
+     * Get A Page Of inventory products
+     * @param page
+     * @param size
+     * @return Page of ProductSummary
+     */
     public Page<ViewProductSummary> getProduct(int page, int size) {
         Pageable pageRequest = PageRequest.of(page, size);
         return this.viewProductListRepository.findAllBy(pageRequest);
     }
 
+    /**
+     * Create new Inventory Item
+     * @param inventoryDto
+     * @param createdBy
+     * @param existingProductId
+     * @throws Exception if Product cannot be found
+     */
     @Transactional
     public void createInventory(InventoryDto inventoryDto, String createdBy, Long existingProductId) throws Exception {
 
@@ -104,7 +117,7 @@ public class InventoryService extends BaseService{
         if(inventoryDto.maximumQuantity() != null) {
             newInventory.setMaximumQuantity(inventoryDto.maximumQuantity());
         }
-        // TODO BUG - Fix notes not populating in db
+
         if(inventoryDto.notes() != null) {
             newInventory.setNotes(inventoryDto.notes());
         }
@@ -112,6 +125,15 @@ public class InventoryService extends BaseService{
         return newInventory;
     }
 
+    /**
+     * Update Inventory Item
+     * InventoryID is required in the request to pinpoint the exact inventory item
+     * as Inventory can be located in multiple locations
+     * @param productId
+     * @param inventoryDto
+     * @param updatedBy
+     * @throws Exception
+     */
     @Transactional
     public void updateInventory(Long productId, InventoryDto inventoryDto, String updatedBy) throws Exception {
 
@@ -148,10 +170,23 @@ public class InventoryService extends BaseService{
         this.productRepository.save(updatedProduct);
     }
 
+    /**
+     * Get breakdown of inventory item per location
+     * @param productId
+     * @return
+     */
     public List<InventoryByLocationInfo> getInventorySummaryByLocation(Long productId) {
         return this.inventoryRepository.findAllLocationProductSummaryByProductId(productId);
     }
 
+    /**
+     * Add Inventory Item into another location
+     * @param productId
+     * @param warehouseId
+     * @param dto
+     * @param createdBy
+     * @throws Exception if product entity cannot be found nor inventory entity
+     */
     @Transactional
     public void addInventoryItemToOtherLocation(Long productId, Long warehouseId, InventoryDto dto, String createdBy) throws Exception {
 
@@ -164,6 +199,11 @@ public class InventoryService extends BaseService{
         this.createInventory(inventoryDto, createdBy, productId);
     }
 
+    /**
+     * Delete Inventory Item
+     * Delete all inventory item from other location
+     * @param productId
+     */
     @Transactional
     public void deleteInventory(Long productId) {
 

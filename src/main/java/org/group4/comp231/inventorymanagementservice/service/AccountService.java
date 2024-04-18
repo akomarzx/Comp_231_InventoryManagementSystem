@@ -30,11 +30,21 @@ public class AccountService extends BaseService {
         this.staticCodeService = staticCodeService;
     }
 
+    /**
+     * Get Account By ID
+     * @param id
+     * @return
+     */
     @Transactional
     public AccountSummaryInfo getAccount(Long id) {
             return accountRepository.findAccountById(id);
     }
 
+    /**
+     * Get All Accounts By Type, when no type was supplied then return all
+     * @param type
+     * @return
+     */
     @Transactional
     public List<AccountSummaryInfo> getAllAccount(String type) {
 
@@ -48,6 +58,12 @@ public class AccountService extends BaseService {
 
     }
 
+    /**
+     * Create new Account - Vendor/Customer
+     * @param dto
+     * @param createdBy
+     */
+    @Transactional
     public void createAccount(AccountDto dto, String createdBy) {
 
         Long tenantId = this.tenantIdentifierResolver.resolveCurrentTenantIdentifier();
@@ -62,6 +78,13 @@ public class AccountService extends BaseService {
 
     }
 
+    /**
+     * Update Existing Account
+     * @param categoryId
+     * @param dto
+     * @param updatedBy
+     * @throws Exception If entity cannot be found
+     */
     @Transactional
     public void updateAccount(Long categoryId, AccountDto dto, String updatedBy) throws Exception {
 
@@ -95,7 +118,12 @@ public class AccountService extends BaseService {
         this.accountRepository.deleteById(id);
     }
 
-    private Long getAccountTypeCodeValueId(String type) {
+    /**
+     *
+     * @param type
+     * @return
+     */
+    public Long getAccountTypeCodeValueId(String type) {
 
         Long codeValueId = null;
 

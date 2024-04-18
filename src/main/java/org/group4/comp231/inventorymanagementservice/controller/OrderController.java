@@ -34,6 +34,16 @@ public class OrderController extends BaseController {
         this.orderService = orderService;
     }
 
+    @GetMapping("/{id}")
+    @Operation(description = "Update Sales/Purchase Order")
+    public ResponseEntity<Order> updatePurchaseOrder(@NotNull @PathVariable("id") Long id,
+                                                                @AuthenticationPrincipal(expression = "claims['email']") String updatedBy) throws Exception {
+
+
+        return ResponseEntity.ok(this.orderService.getOrder(id));
+
+    }
+
     @GetMapping
     @Operation(description = "Get All Orders")
     public ResponseEntity<List<Order>> getAllOrders(@RequestParam(required = false) String type) {

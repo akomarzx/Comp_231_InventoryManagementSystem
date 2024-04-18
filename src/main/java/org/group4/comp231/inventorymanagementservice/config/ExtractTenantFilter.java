@@ -7,6 +7,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 import java.io.IOException;
 
+/**
+ * Filter to extract Tenant ID in JWT
+ */
 public class ExtractTenantFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

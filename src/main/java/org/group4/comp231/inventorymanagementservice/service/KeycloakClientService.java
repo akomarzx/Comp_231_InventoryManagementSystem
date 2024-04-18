@@ -31,6 +31,12 @@ public class KeycloakClientService extends BaseService {
         this.userRepresentationMapper = userRepresentationMapper;
     }
 
+    /**
+     * Send Request to Create New User in the IAM platform
+     * @param dto
+     * @param tenantId
+     * @param isNewCustomerRegistration
+     */
     public void registerNewUser(UserRegistrationDto dto, Long tenantId, boolean isNewCustomerRegistration) {
 
         UsersResource usersResource = this.clientConfig.usersResource();
@@ -46,6 +52,11 @@ public class KeycloakClientService extends BaseService {
         }
     }
 
+    /**
+     * Send Request to get all user belonging to the same tenant using tenant_id in the JWT
+     * @param tenantId
+     * @return
+     */
     public List<UserSummaryInfoDto> getAllUsersByTenant(@NotNull Long tenantId) {
 
         UsersResource usersResource = this.clientConfig.usersResource();
@@ -59,6 +70,12 @@ public class KeycloakClientService extends BaseService {
         return allUserByTenant.stream().map(this.userRepresentationMapper::toDto).collect(Collectors.toList());
     }
 
+    /**
+     * Update User Info in IAM platform
+     * @param userId
+     * @param userUpdateDto
+     * @param tenantId
+     */
     public void updateUser(@NotNull String userId, @NotNull UserUpdateDto userUpdateDto, Long tenantId) {
 
         UsersResource usersResource = this.clientConfig.usersResource();
@@ -80,6 +97,10 @@ public class KeycloakClientService extends BaseService {
         this.updateUserGroups(this.getGroupNameByCode(userUpdateDto.getGroupCodes()), userResource);
     }
 
+    /**
+     * Remove User from the IAM
+     * @param userId
+     */
     public void deleteUser(@NotNull String userId) {
 
         UsersResource usersResource = this.clientConfig.usersResource();
@@ -88,6 +109,13 @@ public class KeycloakClientService extends BaseService {
 
     }
 
+    /**
+     * Create UserRepresentation from request object
+     * @param dto
+     * @param tenantId
+     * @param newCustomerRegistration
+     * @return
+     */
     private UserRepresentation mapNewUserRepresentationDTO(@NotNull UserRegistrationDto dto, @NotNull Long tenantId, boolean newCustomerRegistration) {
 
         UserRepresentation keycloakUserRepresentationDto = new UserRepresentation();
@@ -117,6 +145,11 @@ public class KeycloakClientService extends BaseService {
         return keycloakUserRepresentationDto;
     }
 
+    /**
+     * Update user groups in the IAM to modify their existing permissions
+     * @param groupNames
+     * @param userResource
+     */
     private void updateUserGroups(List<String> groupNames, UserResource userResource) {
 
         List<GroupRepresentation> existingGroupsInRealm = this.clientConfig.realmRepresentation().groups().groups();

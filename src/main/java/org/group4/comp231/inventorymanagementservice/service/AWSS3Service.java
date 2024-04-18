@@ -25,6 +25,12 @@ public class AWSS3Service extends BaseService {
         this.s3client = s3client;
     }
 
+    /**
+     * Upload file into aws s3
+     * @param keyName
+     * @param file
+     * @return string URL for the file uploaded
+     */
     public String uploadFile(String keyName, MultipartFile file) {
         try {
             ObjectMetadata metadata = new ObjectMetadata();
