@@ -43,6 +43,26 @@ public class OrderService extends BaseService {
         this.orderStatusChangeRepository = orderStatusChangeRepository;
     }
 
+
+    /**
+     * Get All orders by type
+     * @param type
+     * @return List of Orders
+     */
+    @Transactional
+    public Order getOrder(Long id) throws Exception {
+        Optional<Order> order = orderRepository.findById(id);
+        if(order.isEmpty()) {
+            throw new Exception("Order Entity not found");
+        }
+        for (OrderStatusChange statusChange : order.get().getOrderStatusChanges()) {
+            statusChange.setStatusCodeId(statusChange.getOrderStatus().getCode());
+        }
+
+        return order.get();
+    }
+
+
     /**
      * Get All orders by type
      * @param type
