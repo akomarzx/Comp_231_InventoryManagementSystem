@@ -68,7 +68,7 @@ public class OrderService extends BaseService {
      * @param createdBy
      * @throws Exception
      */
-    @Transactional
+    @Transactional(rollbackOn = {Exception.class})
     public void createOrder(OrderDto dto, String createdBy) throws Exception {
 
         validateCreateOrderRequest(dto);

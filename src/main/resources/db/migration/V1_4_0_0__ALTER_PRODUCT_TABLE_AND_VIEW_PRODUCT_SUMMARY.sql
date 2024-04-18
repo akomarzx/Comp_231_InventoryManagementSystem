@@ -11,6 +11,7 @@ ALTER VIEW `view_product_summary` AS
         `prd`.`image_url` AS `image_url`,
         `prd`.`created_at` AS `created_at`,
         `prd`.`selling_price`,
+        `itry`.inventory_id,
         SUM(`itry`.`quantity`) AS `quantity`,
         GROUP_CONCAT(DISTINCT `w`.`label`
                      ORDER BY `w`.`label` ASC
@@ -23,7 +24,7 @@ ALTER VIEW `view_product_summary` AS
             JOIN `inventory` `itry` ON ((`prd`.`product_id` = `itry`.`product_id`)))
             JOIN `warehouse` `w` ON ((`itry`.`warehouse_id` = `w`.`warehouse_id`)))
             JOIN `category` `cat` ON ((`cat`.`category_id` = `prd`.`category_id`)))
-    GROUP BY `prd`.`product_id`
+    GROUP BY `prd`.`product_id`, `itry`.inventory_id
     ORDER BY `prd`.`product_id`
 
 
