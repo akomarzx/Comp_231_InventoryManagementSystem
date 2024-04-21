@@ -1,6 +1,9 @@
 name: Build and Push to ecr
 on:
-  workflow_dispatch:
+  push:
+      branches:
+        - staging
+        - master
   
 jobs:
   build-and-push:
