@@ -94,9 +94,4 @@ public class InventoryController extends BaseController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping(path = "/upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public String uploadFile(@RequestParam("file") MultipartFile file) {
-        return awss3Service.uploadFile(file.getOriginalFilename(), file);
-    }
-
 }
