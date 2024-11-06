@@ -28,7 +28,7 @@ jobs:
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: comp-231
+        ECR_REPOSITORY: ${{ ims_repo }}
         IMAGE_TAG: api_latest
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
