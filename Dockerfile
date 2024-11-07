@@ -12,4 +12,4 @@ RUN addgroup --system juser
 RUN adduser -S -s /bin/false -G juser juser
 RUN chown -R juser:juser /application
 USER juser
-ENTRYPOINT ["java", "-XX:+UseSerialGC","-Xmx32m", "-Xss256k", "-jar", "InventoryManagementService-0.0.1.jar"]
+ENTRYPOINT ["java", "-server", "-jar", "InventoryManagementService-0.0.1.jar"]
